@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "HelloWorld",
-    "slug": "expo-template-default",
+    "name": "Worthy I",
+    "slug": "worthy-i",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,13 +13,15 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.worthyi.worthyi"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.worthyi.worthyi"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +33,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ba041c45-0229-437a-8d3e-81aba979dd5b"
+      }
+    },
+    "owner": "worthyi",
+    "updates": {
+      "url": "https://u.expo.dev/ba041c45-0229-437a-8d3e-81aba979dd5b"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }
