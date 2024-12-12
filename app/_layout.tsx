@@ -1,11 +1,13 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import {Navigator, Redirect, Stack} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
+import React, { useEffect } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import {AuthProvider, useAuth} from "@/context/AuthContext";
+import Slot = Navigator.Slot;
+import Loading from "@/app/loading";
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -23,15 +25,17 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <Loading />;
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+     /*
+     * TODO: AuthProvider가 적용되는 범위 더 자세하게 나누기
+     * */
+      <AuthProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Slot></Slot>
+        </ThemeProvider>
+      </AuthProvider>
   );
 }
