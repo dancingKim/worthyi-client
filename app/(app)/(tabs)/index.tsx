@@ -50,16 +50,16 @@ export default function HomeScreen() {
         condition: true,
         data: null,
         method: 'POST',
-        url: 'http://10.138.45.132:8080/action/child'
-        // url: 'http://192.168.0.7:8080/action/child'
+        // url: 'http://10.138.45.132:8080/action/child'
+        url: 'http://192.168.0.7:8080/action/child'
     });
 
     const { data: adultData, isLoading: adultIsLoading, error: adultError, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<AdultActionResponse>>({
         condition: true,
         data: null,
         method: 'POST',
-        url: 'http://10.138.45.132:8080/action/adult'
-        // url: 'http://192.168.0.7:8080/action/adult'
+        // url: 'http://10.138.45.132:8080/action/adult'
+        url: 'http://192.168.0.7:8080/action/adult'
     });
 
     useEffect(() => {
