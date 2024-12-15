@@ -63,12 +63,7 @@ export function useApiGeneric<T = any, U = any>({
      */
     const execute = useCallback(
         async (payload?: T) => {
-            console.log("execute", payload);
-            console.log("conditoin", condition);
-            console.log("url", url);
-            console.log("method", method);
-            console.log("data", data);
-            console.log("error", error);
+
             // 요청 실행 조건이 false면 함수 종료
             if (!condition) return;
             // 로딩 상태를 true로 설정
@@ -95,8 +90,6 @@ export function useApiGeneric<T = any, U = any>({
                 // 저장된 인증 토큰 가져오기
                 const token = await getToken();
 
-                console.log("token", token);
-
                 // 요청 헤더 설정
                 const headers: HeadersInit = {
                     'Content-Type': 'application/json', // JSON 형식 지정
@@ -113,22 +106,16 @@ export function useApiGeneric<T = any, U = any>({
                     signal, // 요청 취소 시그널
                 };
 
-                console.log("fetchOptions = ",fetchOptions);
 
                 // GET 메소드가 아닌 경우, 요청 본문에 데이터 추가
                 if (method !== 'GET' && payload) {
                     fetchOptions.body = JSON.stringify(payload); // 데이터를 JSON 문자열로 변환
                 }
 
-                console.log("fetchOptions.body:",fetchOptions.body);
-                console.log("fetchOptions after body added:",fetchOptions);
-
                 // fetch를 사용하여 API 요청 실행
                 const res = await fetch(url, fetchOptions);
-                console.log("res:",res);
                 // 응답을 상태에 저장
                 setResponse(res);
-                console.log("response set:",response);
 
                 if (!res.ok) {
                     const contentType = res.headers.get('content-type');
@@ -156,10 +143,8 @@ export function useApiGeneric<T = any, U = any>({
             } catch (err: any) {
                 // 요청이 취소된 경우 처리
                 if (err.name === 'AbortError') {
-                    console.log('Fetch aborted');
                 } else {
                     // 기타 에러 처리
-                    console.log(`${method} 요청 실패:`, err);
                     // 에러 상태를 업데이트
                     setError(err);
                     // 공통 에러 처리 함수 호출, logout 함수 전달
