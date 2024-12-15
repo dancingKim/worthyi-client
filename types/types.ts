@@ -14,7 +14,7 @@ export interface ApiResponse<T> {
 export interface ActionResponse {
     childActionId: number;
     childActionContent: string;
-    adultActions: Object[];
+    adultActions: AdultActionResponse[]; // Object[] 대신 AdultActionResponse[]
 }
 
 export interface AdultActionResponse {

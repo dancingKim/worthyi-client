@@ -33,6 +33,8 @@ const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const INITIAL_POSITION = SCREEN_HEIGHT * 0.6;
+interface DateResponse extends ApiResponse<ActionResponse[]> {}
+
 
 export default function HomeScreen() {
     const [childActionContent, setChildActionContent] = useState<string>('');
@@ -43,6 +45,16 @@ export default function HomeScreen() {
     const [selectedItemId, setSelectedItemId] = useState<string>('');
     const [adultActionInput, setAdultActionInput] = useState<string>('');
 
+    // 날짜 포맷 함수 예시
+    function formatDate(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 0부터 시작
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date())); // 예: 기본 날짜
+
     const animatedValue = useRef(new Animated.Value(INITIAL_POSITION)).current;
     const currentPosition = useRef(INITIAL_POSITION);
 
@@ -51,7 +63,8 @@ export default function HomeScreen() {
         data: null,
         method: 'POST',
         // url: 'http://10.138.45.132:8080/action/child'
-        url: 'http://192.168.0.7:8080/action/child'
+        url: 'http://192.168.0.3:8080/action/child'
+        // url: 'http://192.168.0.249:8080/action/child'
     });
 
     const { data: adultData, isLoading: adultIsLoading, error: adultError, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<AdultActionResponse>>({
@@ -59,8 +72,43 @@ export default function HomeScreen() {
         data: null,
         method: 'POST',
         // url: 'http://10.138.45.132:8080/action/adult'
-        url: 'http://192.168.0.7:8080/action/adult'
+        url: 'http://192.168.0.3:8080/action/adult'
+        // url: 'http://192.168.0.249:8080/action/adult'
     });
+
+
+    const { data: dateData, isLoading: dateLoading, error: dateError, execute: dateExecute } = useApiGeneric<null, DateResponse>({
+        condition: true,
+        data: null,
+        method: 'GET',
+        // 서버 주소 및 date 파라미터 추가
+        url: `http://192.168.0.3:8080/action?date=${selectedDate}`
+    });
+
+    useEffect(() => {
+        // selectedDate가 변경될 때마다 해당 날짜의 데이터를 fetch
+        (async () => {
+            await dateExecute();
+        })();
+    }, [selectedDate]);
+
+    useEffect(() => {
+        if (dateData && dateData.data) {
+            const actionList: ChildActionItem[] = dateData.data.map(item => ({
+                id: item.childActionId.toString(),
+                childActionContent: item.childActionContent,
+                // adultActions: AdultActionDto.Response[] -> string[]
+                adultActions: item.adultActions.map(a => a.adultActionContent)
+            }));
+            setChildActionList(actionList);
+        }
+    }, [dateData]);
+
+    useEffect(() => {
+        if (dateError) {
+            Alert.alert('오류', '해당 날짜의 감사 목록을 불러오는 중 오류가 발생했습니다.');
+        }
+    }, [dateError]);
 
     useEffect(() => {
         const listenerId = animatedValue.addListener(({ value }) => {
@@ -153,7 +201,6 @@ export default function HomeScreen() {
 
     useEffect(() => {
         if (data && data.data) {
-            console.log("data:", data);
             const childActionData = data.data;
             const newChildAction: ChildActionItem = {
                 id: childActionData.childActionId.toString(),
@@ -167,7 +214,6 @@ export default function HomeScreen() {
 
     useEffect(() => {
         if (adultData && adultData.data) {
-            console.log("adultData:", adultData);
             const adultActionData = adultData.data;
             setChildActionList(prevList => prevList.map(item => {
                 if (item.id === adultActionData.childActionId.toString()) {
