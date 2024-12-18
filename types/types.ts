@@ -29,7 +29,32 @@ export interface AdultActionItem {
     childActionId: string;
 }
 
+export interface DailyLog {
+    date: string;
+    actions: ActionResponse[];
+}
+
+export interface ActionLogResponse {
+    dailyLogs: DailyLog[];
+    weeklyCount: number;
+    monthlyCount: number;
+    yearlyCount: number;
+}
+
 export interface AddAdultActionRequest {
     adultActionContent: string;
     childActionId: number; // 백엔드에서 Long 타입으로 기대
+}
+
+interface Avatar {
+    avatarId: number;
+    name: string;
+    appearance: string;
+}
+
+export interface UserMeResponse {
+    email: string;
+    photoURL?: string;
+    name: string;
+    avatars: Avatar[];
 }

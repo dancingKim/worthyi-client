@@ -4,7 +4,7 @@
 │   ├── (app)
 │   │   ├── (tabs)
 │   │   │   ├── _layout.tsx
-│   │   │   ├── explore.tsx
+│   │   │   ├── my-log.tsx
 │   │   │   ├── index.tsx
 │   │   │   └── profile.tsx
 │   │   └── _layout.tsx

@@ -1,6 +1,8 @@
 // components/SpeechBubble.tsx
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 
 interface SpeechBubbleProps {
     title?: string;
@@ -11,10 +13,6 @@ interface SpeechBubbleProps {
     buttonText: string;
     showTitle?: boolean;
 }
-
-const TriangleDown = () => (
-    <View style={styles.triangleDown}></View>
-);
 
 const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                                                        title,
@@ -27,25 +25,45 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                                                    }) => {
     return (
         <View style={styles.speechBubbleContainer}>
-            <View style={styles.speechBubble}>
-                {showTitle && <Text style={styles.title}>{title}</Text>}
-                <TextInput
-                    style={styles.textInputFixed}
-                    placeholder={placeholder}
-                    value={value}
-                    onChangeText={onChangeText}
-                    multiline
-                    textAlignVertical="top"
-                    maxLength={200}
-                    scrollEnabled={true}
-                    editable={true}
-                    keyboardType="default"
-                />
-                <TouchableOpacity style={styles.button} onPress={onPress}>
-                    <Text style={styles.buttonText}>{buttonText}</Text>
+            <LinearGradient
+                colors={['#FFE4E1', '#FAF0E6']}
+                style={styles.speechBubble}
+            >
+                {showTitle && (
+                    <View style={styles.titleContainer}>
+                        <Ionicons name="heart" size={20} color="#FF69B4" />
+                        <Text style={styles.title}>{title}</Text>
+                    </View>
+                )}
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.textInputFixed}
+                        placeholder={placeholder}
+                        placeholderTextColor="#999"
+                        value={value}
+                        onChangeText={onChangeText}
+                        multiline
+                        textAlignVertical="top"
+                        maxLength={200}
+                        scrollEnabled={true}
+                        editable={true}
+                    />
+                    <Text style={styles.charCount}>{value.length}/200</Text>
+                </View>
+                <TouchableOpacity 
+                    style={styles.button} 
+                    onPress={onPress}
+                    activeOpacity={0.8}
+                >
+                    <LinearGradient
+                        colors={['#FF69B4', '#FF1493']}
+                        style={styles.gradientButton}
+                    >
+                        <Text style={styles.buttonText}>{buttonText}</Text>
+                    </LinearGradient>
                 </TouchableOpacity>
-            </View>
-            <TriangleDown />
+            </LinearGradient>
+            <View style={styles.triangleDown} />
         </View>
     );
 };
@@ -54,61 +72,83 @@ const styles = StyleSheet.create({
     speechBubbleContainer: {
         alignItems: 'center',
         marginVertical: 20,
+        width: '100%',
     },
     speechBubble: {
-        backgroundColor: '#FAF0E6',
-        borderRadius: 15,
-        padding: 10,
-        width: '80%',
-        maxWidth: 350,
+        borderRadius: 20,
+        padding: 15,
+        width: '90%',
+        maxWidth: 400,
         alignSelf: 'center',
-        elevation: 3,
+        elevation: 5,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        borderWidth: 1,
-        borderColor: '#ccc',
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
-    triangleDown: {
-        width: 0,
-        height: 0,
-        borderLeftWidth: 15,
-        borderRightWidth: 15,
-        borderTopWidth: 15,
-        borderLeftColor: 'transparent',
-        borderRightColor: 'transparent',
-        borderTopColor: '#FAF0E6',
-        marginTop: -1,
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 10,
+        gap: 8,
     },
     title: {
         fontSize: 18,
-        marginBottom: 5,
-        textAlign: 'center',
+        fontWeight: '600',
+        color: '#333',
+    },
+    inputContainer: {
+        position: 'relative',
+        marginBottom: 15,
     },
     textInputFixed: {
-        height: 80,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 8,
-        paddingHorizontal: 10,
-        width: '100%',
-        marginBottom: 10,
+        height: 100,
         backgroundColor: '#fff',
-        textAlignVertical: 'top',
-        overflow: 'hidden',
+        borderRadius: 15,
+        paddingHorizontal: 15,
+        paddingTop: 12,
+        paddingBottom: 12,
+        fontSize: 16,
+        color: '#333',
+        borderWidth: 1,
+        borderColor: 'rgba(0,0,0,0.1)',
+    },
+    charCount: {
+        position: 'absolute',
+        bottom: 8,
+        right: 12,
+        fontSize: 12,
+        color: '#666',
+    },
+    gradientButton: {
+        borderRadius: 25,
+        paddingVertical: 12,
+        paddingHorizontal: 25,
     },
     button: {
-        backgroundColor: '#000',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        marginTop: 5,
         alignSelf: 'center',
+        borderRadius: 25,
+        overflow: 'hidden',
     },
     buttonText: {
         color: '#fff',
         fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    triangleDown: {
+        width: 0,
+        height: 0,
+        backgroundColor: 'transparent',
+        borderStyle: 'solid',
+        borderLeftWidth: 15,
+        borderRightWidth: 15,
+        borderTopWidth: 20,
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderTopColor: '#FAF0E6',
+        transform: [{ translateY: -1 }],
     },
 });
 

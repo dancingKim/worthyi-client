@@ -3,6 +3,7 @@
     "name": "Worthy I",
     "slug": "worthy-i",
     "version": "1.0.0",
+    "runtimeVersion": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -12,6 +13,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "jsEngine": "hermes",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.worthyi.worthyi"
@@ -43,9 +45,6 @@
     "owner": "worthyi",
     "updates": {
       "url": "https://u.expo.dev/ba041c45-0229-437a-8d3e-81aba979dd5b"
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
     }
   }
 }

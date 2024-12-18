@@ -8,14 +8,16 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
     /*
     * TODO: BASE_URL 로컬, 배포 환경에 따라 다르게 처리
     * */
-    const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
+    const OAUTH_BASE_URL = Constants.expoConfig?.extra?.OAUTH_BASE_URL;
+    console.log('Current ENV:', Constants.expoConfig?.extra?.ENV);
+    console.log('All extra config:', Constants.expoConfig?.extra);
+    console.log("OAUTH_BASE_URL:", OAUTH_BASE_URL);
     // React Native Deep Linking URL 생성
     const redirectUri = Linking.createURL("sociallogin");
     const FRONTEND_URL = Linking.createURL('');
     // Spring Boot 서버의 인증 요청 URL
-    const AUTH_URL = `${BASE_URL}/auth/authorize/${provider}?redirect_uri=${FRONTEND_URL}`;
+    const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${FRONTEND_URL}`;
     console.log("AUTH_URL:", AUTH_URL);
-
 
     try {
         // Expo WebBrowser를 사용하여 인증 세션 시작
@@ -25,9 +27,9 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
             const token =  extractTokenFromUrl(result.url);
             if (token) {
                 console.log("토큰 추출 성공:", token);
-                login(token);
+                await login(token);
                 Alert.alert("로그인 성공", "로그인이 완료되었습니다.");
-                router.push("/"); // 메인 화면으로 이동
+                router.replace("/(app)/(tabs)");
             } else {
                 console.error("URL에 토큰이 포함되지 않았습니다.");
                 Alert.alert("로그인 실패", "토큰을 가져오지 못했습니다.");

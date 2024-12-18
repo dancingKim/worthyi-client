@@ -20,7 +20,8 @@ export default ({config}) => {
     const extra = {
         ENV,
         development: {
-            BASE_URL: `http://${localIpAddress}.nip.io:8080`,
+            OAUTH_BASE_URL: `http://${localIpAddress}.nip.io:8080`,
+            BASE_URL: `http://${localIpAddress}:8080`,
         },
         staging: {},
         production: {},
@@ -30,7 +31,8 @@ export default ({config}) => {
         ...config,
         extra: {
             ...extra,
-            BASE_URL: extra[ENV]?.BASE_URL
+            BASE_URL: extra[ENV]?.BASE_URL,
+            OAUTH_BASE_URL: extra[ENV]?.OAUTH_BASE_URL
         },
     };
 };

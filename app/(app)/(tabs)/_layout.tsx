@@ -24,9 +24,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="my-log"
         options={{
-          title: 'Explore',
+          title: 'My Log',
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon name={focused ? 'stats-chart' : 'stats-chart-outline'} color={color} />
           ),

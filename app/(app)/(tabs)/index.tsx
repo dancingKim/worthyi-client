@@ -57,32 +57,24 @@ export default function HomeScreen() {
 
     const animatedValue = useRef(new Animated.Value(INITIAL_POSITION)).current;
     const currentPosition = useRef(INITIAL_POSITION);
+    const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
     const { data, isLoading, error, execute } = useApiGeneric<{ childActionContent: string }, ApiResponse<ActionResponse>>({
         condition: true,
-        data: null,
         method: 'POST',
-        // url: 'http://10.138.45.132:8080/action/child'
-        url: 'http://192.168.0.3:8080/action/child'
-        // url: 'http://192.168.0.249:8080/action/child'
+        url: `${BASE_URL}/action/child`
     });
 
     const { data: adultData, isLoading: adultIsLoading, error: adultError, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<AdultActionResponse>>({
         condition: true,
-        data: null,
         method: 'POST',
-        // url: 'http://10.138.45.132:8080/action/adult'
-        url: 'http://192.168.0.3:8080/action/adult'
-        // url: 'http://192.168.0.249:8080/action/adult'
+        url: `${BASE_URL}/action/adult`
     });
-
 
     const { data: dateData, isLoading: dateLoading, error: dateError, execute: dateExecute } = useApiGeneric<null, DateResponse>({
         condition: true,
-        data: null,
         method: 'GET',
-        // 서버 주소 및 date 파라미터 추가
-        url: `http://192.168.0.3:8080/action?date=${selectedDate}`
+        url: `${BASE_URL}/action?date=${selectedDate}`
     });
 
     useEffect(() => {
