@@ -13,7 +13,7 @@ export default function ProfileScreen () {
                 headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
                 headerImage={
                     <Image
-                        source={{ uri: user?.photoURL || 'https://via.placeholder.com/150' }}
+                        source={{ uri: user?.avatars?.[0]?.appearance || 'https://via.placeholder.com/150' }}
                         style={styles.profileImage}
                     />
                 }>
