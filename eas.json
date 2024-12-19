@@ -1,17 +1,14 @@
 {
   "cli": {
-    "version": ">= 13.1.0",
+    "version": ">= 5.9.1",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
+      "env": {
+        "NODE_ENV": "development"
       }
     },
     "development-simulator": {
@@ -21,27 +18,13 @@
       }
     },
     "preview": {
-      "distribution": "internal",
-      "channel": "main",
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
-      }
+      "distribution": "internal"
     },
     "production": {
-      "channel": "production",
       "autoIncrement": true,
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
+      "env": {
+        "NODE_ENV": "production"
       }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }

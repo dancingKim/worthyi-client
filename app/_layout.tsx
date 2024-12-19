@@ -1,12 +1,12 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import {Navigator, Redirect, Stack} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import {AuthProvider, useAuth} from "@/context/AuthContext";
-import Slot = Navigator.Slot;
 import Loading from "@/app/loading";
+import {Navigator, Redirect, Stack} from 'expo-router';
+import Slot = Navigator.Slot;
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -34,7 +34,7 @@ export default function RootLayout() {
      * */
       <AuthProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Slot></Slot>
+          <Slot />
         </ThemeProvider>
       </AuthProvider>
   );

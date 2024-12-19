@@ -244,7 +244,7 @@ export default function HomeScreen() {
                             buttonText="어른인 내게 감사 들려주기"
                         />
                         <Image
-                            source={require('@/assets/images/avatar-pixel.png')}
+                            source={require('@/assets/images/avatar-girl-euna.jpeg')}
                             style={styles.avatarImage}
                         />
                     </View>
@@ -356,8 +356,8 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     avatarImage: {
-        width: 100,
-        height: 100,
+        width: 200,
+        height: 200,
         resizeMode: 'contain',
         marginVertical: 10,
     },

@@ -54,7 +54,6 @@ interface Avatar {
 
 export interface UserMeResponse {
     email: string;
-    photoURL?: string;
     name: string;
     avatars: Avatar[];
 }

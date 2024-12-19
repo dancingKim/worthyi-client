@@ -37,14 +37,7 @@
     "experiments": {
       "typedRoutes": true
     },
-    "extra": {
-      "eas": {
-        "projectId": "ba041c45-0229-437a-8d3e-81aba979dd5b"
-      }
-    },
     "owner": "worthyi",
-    "updates": {
-      "url": "https://u.expo.dev/ba041c45-0229-437a-8d3e-81aba979dd5b"
-    }
+    "sdkVersion": "52.0.0"
   }
 }
