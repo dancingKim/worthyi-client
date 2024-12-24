@@ -34,7 +34,9 @@ export default function RootLayout() {
      * */
       <AuthProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Slot />
+          <Navigator>
+            <Slot />
+          </Navigator>
         </ThemeProvider>
       </AuthProvider>
   );

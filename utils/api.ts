@@ -16,6 +16,7 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
     const redirectUri = Linking.createURL("sociallogin");
     const FRONTEND_URL = Linking.createURL('');
     // Spring Boot 서버의 인증 요청 URL
+
     const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${FRONTEND_URL}`;
     console.log("AUTH_URL:", AUTH_URL);
 
@@ -27,7 +28,7 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
             const token =  extractTokenFromUrl(result.url);
             if (token) {
                 console.log("토큰 추출 성공:", token);
-                await login(token);
+                login(token);
                 Alert.alert("로그인 성공", "로그인이 완료되었습니다.");
                 router.replace("/(app)/(tabs)");
             } else {

@@ -15,24 +15,29 @@ const getLocalIpAddress = () => {
 
 export default ({ config }) => {
     const localIpAddress = getLocalIpAddress();
-    const ENV = process.env.NODE_ENV || "local";
-    console.log("ENV:", ENV);
-    console.log("process.env.NODE_ENV:", process.env.NODE_ENV);
+    const ENV = process.env.NODE_ENV || "development";
+    console.log("Build ENV:", ENV);
     
     const envConfig = {
-        local: {
+        development: {
             OAUTH_BASE_URL: `http://${localIpAddress}.nip.io:8080`,
             BASE_URL: `http://${localIpAddress}:8080`,
         },
-        development: {
-            OAUTH_BASE_URL: "https://api-dev.worthyi.com",
-            BASE_URL: "https://api-dev.worthyi.com",
+        preview: {
+            OAUTH_BASE_URL: "http://api-dev.worthyilife.com",
+            BASE_URL: "http://api-dev.worthyilife.com",
+        },
+        preview_simulator: {
+            OAUTH_BASE_URL: "http://api-dev.worthyilife.com",
+            BASE_URL: "http://api-dev.worthyilife.com",
         },
         production: {
-            OAUTH_BASE_URL: "https://api.worthyi.com",
-            BASE_URL: "https://api.worthyi.com",
+            OAUTH_BASE_URL: "https://api.worthyilife.com",
+            BASE_URL: "https://api.worthyilife.com",
         },
     };
+
+    const envSettings = envConfig[ENV] || envConfig.development;
 
     return {
         ...config,
@@ -41,8 +46,8 @@ export default ({ config }) => {
                 projectId: "ba041c45-0229-437a-8d3e-81aba979dd5b"
             },
             ENV,
-            ...envConfig[ENV],
             localIpAddress,
+            ...envSettings,
         },
         updates: {
             url: "https://u.expo.dev/ba041c45-0229-437a-8d3e-81aba979dd5b"

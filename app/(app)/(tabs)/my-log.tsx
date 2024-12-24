@@ -102,7 +102,7 @@ export default function MyLogScreen() {
         {actions.length > 0 ? (
             actions.map(action => (
                 <View key={action.childActionId} style={styles.actionContainer}>
-                  <Text style={styles.actionTitle}>아동 행동: {action.childActionContent}</Text>
+                  <Text style={styles.actionTitle}>감사: {action.childActionContent}</Text>
                   {action.adultActions.map(adult => (
                       <Text key={adult.adultActionId} style={styles.adultAction}>칭찬: {adult.adultActionContent}</Text>
                   ))}

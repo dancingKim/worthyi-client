@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 20,
         width: '80%',
-        alignItems: 'center',
+    alignItems: 'center',
     },
     modalTitle: {
         fontSize: 18,

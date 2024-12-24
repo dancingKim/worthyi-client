@@ -23,37 +23,49 @@ export function useApiGeneric<T = any, U = any>(
         setIsLoading(true);
         setError(null);
 
+        const headers: HeadersInit = {
+            'Content-Type': 'application/json',
+            'Accept': '*/*',
+            'Connection': 'keep-alive'
+        };
+
         try {
             const token = await getToken();
-            const headers: HeadersInit = {
-                'Content-Type': 'application/json',
-            };
-            
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            console.log('Fetching:', config.url);
-            const res = await fetch(config.url, {
+            console.log('Request URL:', config.url);
+            console.log('Request Headers:', headers);
+
+            const response = await fetch(config.url, {
                 method: config.method,
                 headers,
                 body: config.method !== 'GET' && payload ? JSON.stringify(payload) : undefined,
             });
 
-            setResponse(res);
-            const responseData = await res.json();
+            console.log('Response Status:', response.status);
+            console.log('Response Headers:', response.headers);
 
-            if (!res.ok) {
+            const responseData = await response.json();
+            
+            if (!response.ok) {
                 throw new Error(responseData.message || 'API request failed');
             }
 
-            console.log('Response:', responseData);
             setData(responseData);
             return responseData;
         } catch (err) {
-            console.error('API Error:', err);
-            setError(err);
-            throw err;
+            const error = err as Error;
+            console.error('Network error details:', {
+                message: error.message,
+                name: error.name,
+                stack: error.stack,
+                url: config.url,
+                headers
+            });
+            setError(error);
+            throw error;
         } finally {
             setIsLoading(false);
         }
