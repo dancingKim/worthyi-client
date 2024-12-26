@@ -47,6 +47,8 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                         maxLength={200}
                         scrollEnabled={true}
                         editable={true}
+                        // autoCorrect={false}
+                        // keyboardType="default"
                     />
                     <Text style={styles.charCount}>{value.length}/200</Text>
                 </View>

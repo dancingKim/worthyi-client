@@ -102,15 +102,15 @@ export default function MyLogScreen() {
         {actions.length > 0 ? (
             actions.map(action => (
                 <View key={action.childActionId} style={styles.actionContainer}>
-                  <Text style={styles.actionTitle}>감사: {action.childActionContent}</Text>
-                  {action.adultActions.map(adult => (
-                      <Text key={adult.adultActionId} style={styles.adultAction}>칭찬: {adult.adultActionContent}</Text>
-                  ))}
+                    <Text style={styles.actionTitle}>감사: {action.childActionContent}</Text>
+                    <Text style={styles.adultAction}>
+                        칭찬: {action.adultActions.map(adult => adult.adultActionContent).join(', ')}
+                    </Text>
                 </View>
             ))
         ) : (
             <View style={styles.emptyContainer}>
-              <Text>해당 날짜에 대한 데이터가 없습니다.</Text>
+                <Text>해당 날짜에 대한 데이터가 없습니다.</Text>
             </View>
         )}
       </ScrollView>

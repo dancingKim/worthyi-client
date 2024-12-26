@@ -24,12 +24,12 @@ export default ({ config }) => {
             BASE_URL: `http://${localIpAddress}:8080`,
         },
         preview: {
-            OAUTH_BASE_URL: "http://api-dev.worthyilife.com",
-            BASE_URL: "http://api-dev.worthyilife.com",
+            OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
+            BASE_URL: "https://api-dev.worthyilife.com",
         },
         preview_simulator: {
-            OAUTH_BASE_URL: "http://api-dev.worthyilife.com",
-            BASE_URL: "http://api-dev.worthyilife.com",
+            OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
+            BASE_URL: "https://api-dev.worthyilife.com",
         },
         production: {
             OAUTH_BASE_URL: "https://api.worthyilife.com",

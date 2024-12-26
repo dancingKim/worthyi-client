@@ -4,7 +4,7 @@ import Constants from "expo-constants";
 import {Alert} from "react-native";
 import {router} from "expo-router";
 
-export const handleSocialLogin = async (provider: string, login: (token: string) => void) => {
+export const handleSocialLogin = async (provider: string, login: (token: string) => Promise<void>) => {
     /*
     * TODO: BASE_URL 로컬, 배포 환경에 따라 다르게 처리
     * */
@@ -28,9 +28,9 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
             const token =  extractTokenFromUrl(result.url);
             if (token) {
                 console.log("토큰 추출 성공:", token);
-                login(token);
+                await login(token);
                 Alert.alert("로그인 성공", "로그인이 완료되었습니다.");
-                router.replace("/(app)/(tabs)");
+                router.push("/(app)/(tabs)");
             } else {
                 console.error("URL에 토큰이 포함되지 않았습니다.");
                 Alert.alert("로그인 실패", "토큰을 가져오지 못했습니다.");

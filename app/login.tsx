@@ -1,10 +1,19 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, SafeAreaView } from "react-native";
 import SocialLoginButton from '@/components/buttons/SocialLoginButton'
-import {handleSocialLogin}from '@/utils/api';
-import {useAuth} from "@/context/AuthContext";
+import { handleSocialLogin } from '@/utils/api';
+import { useAuth } from "@/context/AuthContext";
+
 const LoginScreen: React.FC = () => {
-    const {login} = useAuth();
+    const { login } = useAuth();
+
+    const handleLogin = async (provider: string) => {
+        try {
+            await handleSocialLogin(provider, login);
+        } catch (error) {
+            console.error('Login failed:', error);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -21,7 +30,7 @@ const LoginScreen: React.FC = () => {
                 <View style={[styles.buttonContainer, { marginVertical: 8 }]}>
                     <SocialLoginButton
                         provider="google"
-                        onPress={() => handleSocialLogin("google", login)}
+                        onPress={() => handleLogin("google")}
                     />
                 </View>
             </View>

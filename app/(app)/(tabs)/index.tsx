@@ -243,10 +243,13 @@ export default function HomeScreen() {
                             onPress={addChildAction}
                             buttonText="어른인 내게 감사 들려주기"
                         />
-                        <Image
-                            source={require('@/assets/images/avatar-girl-euna.jpeg')}
-                            style={styles.avatarImage}
-                        />
+
+                <View style={styles.avatarContainer}>
+                            <Image
+                                source={require('@/assets/images/avatar-girl.jpeg')}
+                                style={styles.avatarImage}
+                            />
+                        </View>
                     </View>
                 </View>
 
@@ -269,7 +272,7 @@ export default function HomeScreen() {
                     <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
                         <View style={styles.swipeBar}></View>
                     </View>
-                    <Text style={styles.childActionListTitle}>감사와 칭찬 목록</Text>
+                    <Text style={styles.childActionListTitle}>감사를 꾹 눌러 칭찬해 주기</Text>
                     <ChildActionList
                         childActionList={childActionList}
                         isFlatListScrollable={isFlatListScrollable}
@@ -355,11 +358,22 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         alignSelf: 'center',
     },
+    avatarContainer: {
+        width: '60%',
+        // 말풍선과의 거리 조절
+        marginTop: 0,
+        
+        // 원하는 비율값으로 조절 (예: 16:9)
+        aspectRatio: 1 / 1,
+
+        // 세로로 늘어났을 때 혹은 줄어들었을 때 중앙 정렬
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     avatarImage: {
-        width: 200,
-        height: 200,
+        width: '100%',
+        height: '100%',
         resizeMode: 'contain',
-        marginVertical: 10,
     },
     modalBackground: {
         flex: 1,
