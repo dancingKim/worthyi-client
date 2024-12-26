@@ -1,18 +1,20 @@
 // components/ChildActionList.tsx
 import React from 'react';
-import { FlatList, TouchableOpacity, View, Text, StyleSheet } from 'react-native';
+import { FlatList, TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { ChildActionItem } from '@/types/types';
 
 interface ChildActionListProps {
     childActionList: ChildActionItem[];
     isFlatListScrollable: boolean;
     onLongPressItem: (item: ChildActionItem) => void;
+    contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
 const ChildActionList: React.FC<ChildActionListProps> = ({
                                                              childActionList,
                                                              isFlatListScrollable,
                                                              onLongPressItem,
+                                                             contentContainerStyle
                                                          }) => (
     <FlatList
         data={childActionList}
@@ -29,7 +31,7 @@ const ChildActionList: React.FC<ChildActionListProps> = ({
                 </View>
             </TouchableOpacity>
         )}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={[{ paddingBottom: 20 }, contentContainerStyle]}
         scrollEnabled={isFlatListScrollable}
     />
 );

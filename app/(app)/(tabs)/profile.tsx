@@ -4,7 +4,7 @@ import {ThemedView} from "@/components/ThemedView";
 import LogOutButton from "@/components/buttons/LogOutButton";
 import {useAuth} from "@/context/AuthContext";
 
-export default function ProfileScreen () {
+const ProfileScreen = () => {
     const {user, logout} = useAuth();
 
     return (
@@ -28,7 +28,9 @@ export default function ProfileScreen () {
             </ParallaxScrollView>
         </SafeAreaView>
     );
-}
+};
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
     container: {

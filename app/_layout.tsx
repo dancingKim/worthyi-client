@@ -3,16 +3,13 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import {AuthProvider, useAuth} from "@/context/AuthContext";
+import { AuthProvider } from "@/context/AuthContext";
 import Loading from "@/app/loading";
-import {Navigator, Redirect, Stack} from 'expo-router';
-import Slot = Navigator.Slot;
+import { Stack } from 'expo-router';
 
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+const RootLayout = () => {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -29,15 +26,15 @@ export default function RootLayout() {
   }
 
   return (
-     /*
-     * TODO: AuthProvider가 적용되는 범위 더 자세하게 나누기
-     * */
-      <AuthProvider>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Navigator>
-            <Slot />
-          </Navigator>
-        </ThemeProvider>
-      </AuthProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+        </Stack>
+      </ThemeProvider>
+    </AuthProvider>
   );
-}
+};
+
+export default RootLayout;

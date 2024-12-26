@@ -1,11 +1,12 @@
 // app/(app)/(tabs)/my-log/index.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Alert, Button, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, Button, ScrollView, Dimensions, SafeAreaView, FlatList } from 'react-native';
 import { useApiGeneric } from '@/hooks/api/useApiGeneric';
 import Constants from 'expo-constants';
 import CalendarWithGratitude from '@/components/CalendarWithGratitude';
 import { ApiResponse, ActionLogResponse } from '@/types/types';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
@@ -18,6 +19,7 @@ const formatDate = (date: Date): string => {
 };
 
 export default function MyLogScreen() {
+  const insets = useSafeAreaInsets();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   // date-fns format 함수를 커스텀 formatDate 함수로 교체
   const dateStr = formatDate(selectedDate);
@@ -49,9 +51,14 @@ export default function MyLogScreen() {
   // 감사한 날짜 목록: 데이터가 없으면 빈 배열
   const gratitudeDates = dailyLogs.map(log => log.date);
   const actions = dailyLogs.length > 0 ? dailyLogs[0].actions : [];
+  
+  // 화면 크기에 따른 동적 패딩 계산
+  const screenHeight = Dimensions.get('window').height;
+  const bottomPadding = insets.bottom + (screenHeight * 0.05);
 
   return (
-      <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.container}>
+      
         <Text style={styles.title}>내 감사 로그</Text>
 
         {/* 캘린더는 항상 표시되며, 데이터 없으면 마크 없는 캘린더 */}
@@ -86,39 +93,44 @@ export default function MyLogScreen() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <Button title="다음날" onPress={() => {
-            const nextDay = new Date(selectedDate);
-            nextDay.setDate(nextDay.getDate() + 1);
-            setSelectedDate(nextDay);
-          }} />
           <Button title="이전날" onPress={() => {
             const prevDay = new Date(selectedDate);
             prevDay.setDate(prevDay.getDate() - 1);
             setSelectedDate(prevDay);
           }} />
+          <Button title="다음날" onPress={() => {
+            const nextDay = new Date(selectedDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+            setSelectedDate(nextDay);
+          }} />
         </View>
-
-        {/* 감사 리스트: 데이터가 없는 경우 표시 안 하거나, 빈 상태 표시 */}
-        {actions.length > 0 ? (
-            actions.map(action => (
-                <View key={action.childActionId} style={styles.actionContainer}>
-                    <Text style={styles.actionTitle}>감사: {action.childActionContent}</Text>
-                    <Text style={styles.adultAction}>
-                        칭찬: {action.adultActions.map(adult => adult.adultActionContent).join(', ')}
-                    </Text>
-                </View>
-            ))
-        ) : (
+      <FlatList
+        data={actions}
+        renderItem={({ item: action }) => (
+            <View key={action.childActionId} style={styles.actionContainer}>
+                <Text style={styles.actionTitle}>감사: {action.childActionContent}</Text>
+                <Text style={styles.adultAction}>
+                    칭찬: {action.adultActions.map(adult => adult.adultActionContent).join(', ')}
+                </Text>
+            </View>
+        )}
+        ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
                 <Text>해당 날짜에 대한 데이터가 없습니다.</Text>
             </View>
         )}
-      </ScrollView>
+        contentContainerStyle={{
+            paddingBottom: bottomPadding,
+        }}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 16, backgroundColor: '#fff' },
+    container: {
+        flex: 1,
+    },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   statsContainer: {
     flexDirection: 'row',

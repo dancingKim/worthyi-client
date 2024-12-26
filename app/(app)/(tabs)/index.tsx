@@ -16,7 +16,9 @@ import {
     PanResponder,
     Dimensions,
     Modal,
-    Alert
+    Alert,
+    ScrollView,
+    FlatList
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { useApiGeneric } from '@/hooks/api/useApiGeneric';
@@ -30,6 +32,7 @@ import {
     AdultActionResponse,
     AddAdultActionRequest
 } from '@/types/types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -39,6 +42,7 @@ interface DateResponse extends ApiResponse<ActionResponse[]> {}
 
 
 export default function HomeScreen() {
+    const insets = useSafeAreaInsets();
     const [childActionContent, setChildActionContent] = useState<string>('');
     const [childActionList, setChildActionList] = useState<ChildActionItem[]>([]);
     const [isFlatListScrollable, setIsFlatListScrollable] = useState(true);
@@ -228,8 +232,11 @@ export default function HomeScreen() {
         setSelectedItemId('');
     };
 
+    // 화면 크기에 따른 동적 패딩 계산
+    const screenHeight = Dimensions.get('window').height;
+    const bottomPadding = insets.bottom + (screenHeight * 0.3); // 화면 높이의 12% 정도를 패딩으로 설정
+
     return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
 
 
         <SafeAreaView style={styles.container}>
@@ -238,6 +245,7 @@ export default function HomeScreen() {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
             >
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={styles.mainScreen}>
                     <View style={styles.fixedContent}>
                         <SpeechBubble
@@ -249,7 +257,7 @@ export default function HomeScreen() {
                             buttonText="어른인 내게 감사 들려주기"
                         />
 
-                <View style={styles.avatarContainer}>
+                        <View style={styles.avatarContainer}>
                             <Image
                                 source={require('@/assets/images/avatar-girl.jpeg')}
                                 style={styles.avatarImage}
@@ -257,6 +265,7 @@ export default function HomeScreen() {
                         </View>
                     </View>
                 </View>
+                 </TouchableWithoutFeedback>
 
                 <Animated.View
                     style={[
@@ -274,15 +283,20 @@ export default function HomeScreen() {
                         },
                     ]}
                 >
-                    <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
-                        <View style={styles.swipeBar}></View>
-                    </View>
-                    <Text style={styles.childActionListTitle}>감사를 꾹 눌러 칭찬해 주기</Text>
-                    <ChildActionList
-                        childActionList={childActionList}
-                        isFlatListScrollable={isFlatListScrollable}
-                        onLongPressItem={handleLongPressItem}
-                    />
+                        <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
+                            <View style={styles.swipeBar}></View>
+                        </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View>
+                        <Text style={styles.childActionListTitle}>감사를 꾹 눌러 칭찬해 주기</Text>
+                        <ChildActionList
+                            childActionList={childActionList}
+                            isFlatListScrollable={isFlatListScrollable}
+                            onLongPressItem={handleLongPressItem}
+                            contentContainerStyle={{paddingBottom: bottomPadding}}
+                        />
+        </View>
+                 </TouchableWithoutFeedback>
                 </Animated.View>
             </KeyboardAvoidingView>
 
@@ -292,6 +306,7 @@ export default function HomeScreen() {
                 animationType="slide"
                 onRequestClose={() => setModalVisible(false)}
             >
+                     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={styles.modalBackground}>
                     <View style={styles.modalContainer}>
                         <Text style={styles.modalTitle}>칭찬을 입력해주세요</Text>
@@ -316,9 +331,9 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     </View>
                 </View>
+                    </TouchableWithoutFeedback>
             </Modal>
         </SafeAreaView>
-    </TouchableWithoutFeedback>
     );
 }
 
