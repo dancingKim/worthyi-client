@@ -9,7 +9,9 @@ import {
     TouchableOpacity,
     SafeAreaView,
     Platform,
+    Keyboard,
     KeyboardAvoidingView,
+    TouchableWithoutFeedback,
     Animated,
     PanResponder,
     Dimensions,
@@ -227,6 +229,9 @@ export default function HomeScreen() {
     };
 
     return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+
+
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
                 style={styles.container}
@@ -313,6 +318,7 @@ export default function HomeScreen() {
                 </View>
             </Modal>
         </SafeAreaView>
+    </TouchableWithoutFeedback>
     );
 }
 

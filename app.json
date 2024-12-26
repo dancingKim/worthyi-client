@@ -24,10 +24,6 @@
             "api-dev.worthyilife.com": {
               "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
               "NSIncludesSubdomains": true
-            },
-            "worthyilife.com": {
-              "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
-              "NSIncludesSubdomains": true
             }
           }
         }
