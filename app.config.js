@@ -32,8 +32,8 @@ export default ({ config }) => {
             BASE_URL: "https://api-dev.worthyilife.com",
         },
         production: {
-            OAUTH_BASE_URL: "https://api.worthyilife.com",
-            BASE_URL: "https://api.worthyilife.com",
+            OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
+            BASE_URL: "https://api-dev.worthyilife.com",
         },
     };
 
