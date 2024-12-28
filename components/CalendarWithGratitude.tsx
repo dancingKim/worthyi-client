@@ -1,6 +1,7 @@
 // components/CalendarWithGratitude.tsx
 import React, { useMemo } from 'react';
 import { Calendar } from 'react-native-calendars';
+import { FontFamily } from '@/constants/Fonts';
 
 interface DayObject {
     day: number;
@@ -44,6 +45,11 @@ export default function CalendarWithGratitude({ selectedDate, onDateChange, grat
                 onDateChange(newDate);
             }}
             markedDates={markedDates}
+            theme={{
+                textDayFontFamily: FontFamily.regular,
+                textMonthFontFamily: FontFamily.medium,
+                textDayHeaderFontFamily: FontFamily.medium,
+            }}
         />
     );
 }

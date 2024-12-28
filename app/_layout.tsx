@@ -4,26 +4,47 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from "@/context/AuthContext";
-import Loading from "@/app/loading";
 import { Stack } from 'expo-router';
 
-SplashScreen.preventAutoHideAsync();
+// 가장 먼저 실행되도록 파일 최상단에 배치
+SplashScreen.preventAutoHideAsync()
+  .catch(() => {
+    console.warn('Error preventing splash screen auto hide');
+  });
 
-const RootLayout = () => {
+export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  
+  const [loaded, error] = useFonts({
+    'Pretendard-Thin': require('../assets/fonts/Pretendard-Thin.otf'),
+    'Pretendard-ExtraLight': require('../assets/fonts/Pretendard-ExtraLight.otf'),
+    'Pretendard-Light': require('../assets/fonts/Pretendard-Light.otf'),
+    'Pretendard-Regular': require('../assets/fonts/Pretendard-Regular.otf'),
+    'Pretendard-Medium': require('../assets/fonts/Pretendard-Medium.otf'),
+    'Pretendard-SemiBold': require('../assets/fonts/Pretendard-SemiBold.otf'),
+    'Pretendard-Bold': require('../assets/fonts/Pretendard-Bold.otf'),
+    'Pretendard-ExtraBold': require('../assets/fonts/Pretendard-ExtraBold.otf'),
+    'Pretendard-Black': require('../assets/fonts/Pretendard-Black.otf'),
   });
 
   useEffect(() => {
+    console.log('Font loading status:', loaded);
+    console.log('Font loading error:', error);  // 에러 로그 추가
     if (loaded) {
+      // 폰트 로딩이 완료되면 Splash Screen 숨기기
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, error]);
 
-  if (!loaded) {
-    return <Loading />;
-  }
+  // 디버깅을 위한 더 자세한 에러 로깅
+  useEffect(() => {
+    if (error) {
+      console.error('Font loading error details:', error);
+    }
+  }, [error]);
+
+  // 폰트 로딩 중에는 null 반환 (Splash Screen 유지)
+  if (!loaded) return null;
 
   return (
     <AuthProvider>
@@ -35,6 +56,4 @@ const RootLayout = () => {
       </ThemeProvider>
     </AuthProvider>
   );
-};
-
-export default RootLayout;
+}

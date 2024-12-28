@@ -49,6 +49,17 @@
       "typedRoutes": true
     },
     "owner": "worthyi",
-    "sdkVersion": "52.0.0"
+    "sdkVersion": "52.0.0",
+    "fonts": {
+      "Pretendard-Thin": "./assets/fonts/Pretendard-Thin.otf",
+      "Pretendard-ExtraLight": "./assets/fonts/Pretendard-ExtraLight.otf",
+      "Pretendard-Light": "./assets/fonts/Pretendard-Light.otf",
+      "Pretendard-Regular": "./assets/fonts/Pretendard-Regular.otf",
+      "Pretendard-Medium": "./assets/fonts/Pretendard-Medium.otf",
+      "Pretendard-SemiBold": "./assets/fonts/Pretendard-SemiBold.otf",
+      "Pretendard-Bold": "./assets/fonts/Pretendard-Bold.otf",
+      "Pretendard-ExtraBold": "./assets/fonts/Pretendard-ExtraBold.otf",
+      "Pretendard-Black": "./assets/fonts/Pretendard-Black.otf"
+    }
   }
 }

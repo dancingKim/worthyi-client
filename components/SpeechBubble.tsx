@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { FontFamily } from '@/constants/Fonts';
 
 interface SpeechBubbleProps {
     title?: string;
@@ -32,12 +33,12 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                 {showTitle && (
                     <View style={styles.titleContainer}>
                         <Ionicons name="heart" size={20} color="#FF69B4" />
-                        <Text style={styles.title}>{title}</Text>
+                        <Text style={[styles.title, { fontFamily: FontFamily.bold }]}>{title}</Text>
                     </View>
                 )}
                 <View style={styles.inputContainer}>
                     <TextInput
-                        style={styles.textInputFixed}
+                        style={[styles.textInputFixed, { fontFamily: FontFamily.regular }]}
                         placeholder={placeholder}
                         placeholderTextColor="#999"
                         value={value}
@@ -61,7 +62,7 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                         colors={['#FF69B4', '#FF1493']}
                         style={styles.gradientButton}
                     >
-                        <Text style={styles.buttonText}>{buttonText}</Text>
+                        <Text style={[styles.buttonText, { fontFamily: FontFamily.semiBold }]}>{buttonText}</Text>
                     </LinearGradient>
                 </TouchableOpacity>
             </LinearGradient>

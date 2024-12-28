@@ -3,6 +3,7 @@ import {Image, StyleSheet, Text, View, SafeAreaView} from "react-native";
 import {ThemedView} from "@/components/ThemedView";
 import LogOutButton from "@/components/buttons/LogOutButton";
 import {useAuth} from "@/context/AuthContext";
+import { CommonStyles } from '@/constants/Styles';
 
 const ProfileScreen = () => {
     const {user, logout} = useAuth();
@@ -19,8 +20,8 @@ const ProfileScreen = () => {
                 }>
                 <ThemedView style={styles.container}>
                     <View style={styles.profileInfo}>
-                        <Text style={styles.name}>{user?.name || '사용자'}</Text>
-                        <Text style={styles.email}>{user?.email}</Text>
+                        <Text style={[styles.name, CommonStyles.text]}>{user?.name || '사용자'}</Text>
+                        <Text style={[styles.email, CommonStyles.text]}>{user?.email}</Text>
                     </View>
                     
                     <LogOutButton onPress={() => logout()} />

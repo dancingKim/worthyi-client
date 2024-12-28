@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, SafeAreaView } from "react-native";
 import SocialLoginButton from '@/components/buttons/SocialLoginButton'
 import { handleSocialLogin } from '@/utils/api';
 import { useAuth } from "@/context/AuthContext";
+import { FontFamily } from '@/constants/Fonts';
 
 const LoginScreen: React.FC = () => {
     const { login } = useAuth();
@@ -22,8 +23,14 @@ const LoginScreen: React.FC = () => {
                     source={require("@/assets/images/Worthy-I-logo.png")}
                     style={styles.logo}
                 />
-                <Text style={styles.title}>환영합니다!</Text>
-                <Text style={styles.subtitle}>
+                <Text style={[styles.title, { 
+                    fontFamily: FontFamily.extraBold,
+                    fontSize: 28 
+                }]}>환영합니다!</Text>
+                <Text style={[styles.subtitle, { 
+                    fontFamily: FontFamily.medium,
+                    fontSize: 16 
+                }]}>
                     로그인하고 다양한 서비스를 이용해보세요
                 </Text>
                 

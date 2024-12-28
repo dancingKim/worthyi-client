@@ -33,6 +33,8 @@ import {
     AddAdultActionRequest
 } from '@/types/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CommonStyles } from '@/constants/Styles';
+import { FontFamily } from '@/constants/Fonts';
 
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -288,7 +290,7 @@ export default function HomeScreen() {
                         </View>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View>
-                        <Text style={styles.childActionListTitle}>감사를 꾹 눌러 칭찬해 주기</Text>
+                        <Text style={[styles.childActionListTitle, CommonStyles.heading2]}>감사를 꾹 눌러 칭찬해 주기</Text>
                         <ChildActionList
                             childActionList={childActionList}
                             isFlatListScrollable={isFlatListScrollable}
@@ -309,7 +311,7 @@ export default function HomeScreen() {
                      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={styles.modalBackground}>
                     <View style={styles.modalContainer}>
-                        <Text style={styles.modalTitle}>칭찬을 입력해주세요</Text>
+                        <Text style={[styles.modalTitle, CommonStyles.heading2]}>칭찬을 입력해주세요</Text>
                         <View style={styles.adultActionInputContainer}>
                             <TextInput
                                 style={styles.adultActionTextInput}
@@ -327,7 +329,7 @@ export default function HomeScreen() {
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity style={styles.button} onPress={completePraise}>
-                            <Text style={styles.buttonText}>칭찬 완료</Text>
+                            <Text style={[styles.buttonText, CommonStyles.button]}>칭찬 완료</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -378,6 +380,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginVertical: 10,
         alignSelf: 'center',
+        fontFamily: FontFamily.bold,
     },
     avatarContainer: {
         width: '60%',
@@ -412,6 +415,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 18,
         marginBottom: 10,
+        fontFamily: FontFamily.medium,
     },
     adultActionInputContainer: {
         flexDirection: 'row',
@@ -429,6 +433,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         textAlignVertical: 'top',
         marginRight: 10,
+        fontFamily: FontFamily.regular,
     },
     button: {
         backgroundColor: '#000',
@@ -441,5 +446,6 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontSize: 16,
+        fontFamily: FontFamily.medium,
     },
 });

@@ -4,6 +4,8 @@ import React from 'react';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { CommonStyles } from '@/constants/Styles';
+import { FontFamily } from '@/constants/Fonts';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -13,6 +15,10 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
+        tabBarLabelStyle: {
+          fontFamily: FontFamily.medium,
+          fontSize: 12
+        },
       }}>
       <Tabs.Screen
         name="index"

@@ -7,6 +7,8 @@ import CalendarWithGratitude from '@/components/CalendarWithGratitude';
 import { ApiResponse, ActionLogResponse } from '@/types/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CommonStyles } from '@/constants/Styles';
+import { FontFamily } from '@/constants/Fonts';
 
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
@@ -59,7 +61,7 @@ export default function MyLogScreen() {
   return (
     <SafeAreaView style={styles.container}>
       
-        <Text style={styles.title}>내 감사 로그</Text>
+        <Text style={[styles.title, CommonStyles.heading1]}>내 감사 로그</Text>
 
         {/* 캘린더는 항상 표시되며, 데이터 없으면 마크 없는 캘린더 */}
         <CalendarWithGratitude
@@ -75,20 +77,20 @@ export default function MyLogScreen() {
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Ionicons name="calendar-outline" size={24} color="#4A90E2" />
-            <Text style={styles.statLabel}>이번 주</Text>
-            <Text style={styles.statValue}>{weeklyCount}일</Text>
+            <Text style={[styles.statLabel, CommonStyles.caption]}>이번 주</Text>
+            <Text style={[styles.statValue, { fontFamily: FontFamily.bold }]}>{weeklyCount}일</Text>
           </View>
           
           <View style={styles.statCard}>
             <Ionicons name="moon-outline" size={24} color="#50C878" />
-            <Text style={styles.statLabel}>이번 달</Text>
-            <Text style={styles.statValue}>{monthlyCount}일</Text>
+            <Text style={[styles.statLabel, CommonStyles.caption]}>이번 달</Text>
+            <Text style={[styles.statValue, { fontFamily: FontFamily.bold }]}>{monthlyCount}일</Text>
           </View>
           
           <View style={styles.statCard}>
             <Ionicons name="star-outline" size={24} color="#FFB347" />
-            <Text style={styles.statLabel}>올해</Text>
-            <Text style={styles.statValue}>{yearlyCount}일</Text>
+            <Text style={[styles.statLabel, CommonStyles.caption]}>올해</Text>
+            <Text style={[styles.statValue, { fontFamily: FontFamily.bold }]}>{yearlyCount}일</Text>
           </View>
         </View>
 
@@ -108,8 +110,10 @@ export default function MyLogScreen() {
         data={actions}
         renderItem={({ item: action }) => (
             <View key={action.childActionId} style={styles.actionContainer}>
-                <Text style={styles.actionTitle}>감사: {action.childActionContent}</Text>
-                <Text style={styles.adultAction}>
+                <Text style={[styles.actionTitle, { fontFamily: FontFamily.medium }]}>
+                    감사: {action.childActionContent}
+                </Text>
+                <Text style={[styles.adultAction, { fontFamily: FontFamily.regular }]}>
                     칭찬: {action.adultActions.map(adult => adult.adultActionContent).join(', ')}
                 </Text>
             </View>

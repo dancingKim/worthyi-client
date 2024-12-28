@@ -2,6 +2,8 @@
 import React from 'react';
 import { FlatList, TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { ChildActionItem } from '@/types/types';
+import { CommonStyles } from '@/constants/Styles';
+import { FontFamily } from '@/constants/Fonts';
 
 interface ChildActionListProps {
     childActionList: ChildActionItem[];
@@ -22,9 +24,11 @@ const ChildActionList: React.FC<ChildActionListProps> = ({
         renderItem={({ item }) => (
             <TouchableOpacity onLongPress={() => onLongPressItem(item)}>
                 <View style={styles.childActionItem}>
-                    <Text style={styles.childActionText}>아이의 감사: {item.childActionContent}</Text>
+                    <Text style={[styles.childActionText, { fontFamily: FontFamily.bold }]}>
+                        아이의 감사: {item.childActionContent}
+                    </Text>
                     {item.adultActions.length > 0 && (
-                        <Text style={styles.adultActionsText}>
+                        <Text style={[styles.adultActionsText, { fontFamily: FontFamily.medium }]}>
                             칭찬: {item.adultActions.join(', ')}
                         </Text>
                     )}
@@ -46,7 +50,6 @@ const styles = StyleSheet.create({
     },
     childActionText: {
         fontSize: 16,
-        fontWeight: 'bold',
     },
     adultActionsText: {
         fontSize: 14,
