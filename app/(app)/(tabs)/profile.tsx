@@ -4,6 +4,7 @@ import {ThemedView} from "@/components/ThemedView";
 import LogOutButton from "@/components/buttons/LogOutButton";
 import {useAuth} from "@/context/AuthContext";
 import { CommonStyles } from '@/constants/Styles';
+import { FontFamily } from '@/constants/Fonts';
 
 const ProfileScreen = () => {
     const {user, logout} = useAuth();
@@ -53,10 +54,11 @@ const styles = StyleSheet.create({
     },
     name: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: FontFamily.bold,
     },
     email: {
         fontSize: 16,
         color: '#666',
+        fontFamily: FontFamily.regular,
     },
 });

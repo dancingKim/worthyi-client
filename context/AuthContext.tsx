@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         const initializeAuth = async () => {
             try {
+            console.log("isLoading:", isLoading);
                 setIsLoading(true);
                 const token = await getToken();
                 console.log('Stored token:', token);

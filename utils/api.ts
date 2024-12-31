@@ -3,6 +3,11 @@ import * as Linking from "expo-linking";
 import Constants from "expo-constants";
 import {Alert} from "react-native";
 import {router} from "expo-router";
+import {Platform} from "react-native";
+
+interface WebBrowserResultWithUrl extends WebBrowser.WebBrowserResult {
+  url: string;
+}
 
 export const handleSocialLogin = async (provider: string, login: (token: string) => Promise<void>) => {
     /*
@@ -17,15 +22,27 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
     const FRONTEND_URL = Linking.createURL('');
     // Spring Boot 서버의 인증 요청 URL
 
+    console.log("FRONTEND_URL:", FRONTEND_URL);
+    const returnUrl = redirectUri;
+    console.log("returnUrl:", returnUrl);
+    
     const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${FRONTEND_URL}`;
     console.log("AUTH_URL:", AUTH_URL);
 
     try {
-        // Expo WebBrowser를 사용하여 인증 세션 시작
-        const result = await WebBrowser.openAuthSessionAsync(AUTH_URL);
+        // returnUrl을 명시적으로 전달
+        const result = await WebBrowser.openAuthSessionAsync(
+            AUTH_URL,
+            returnUrl
+        );
+        
+        console.log('인증 결과:', result);
 
-        if (result.type === "success") {
-            const token =  extractTokenFromUrl(result.url);
+        // result.type이 dismiss여도 계속 진행
+        if (result.type === "success" || (Platform.OS === 'android' && result.type === "dismiss")) {
+            const resultWithUrl = result as WebBrowserResultWithUrl;
+            console.log("resultWithUrl:", resultWithUrl);
+            const token = resultWithUrl.url ? extractTokenFromUrl(resultWithUrl.url) : null;
             if (token) {
                 console.log("토큰 추출 성공:", token);
                 await login(token);
@@ -35,8 +52,15 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
                 console.error("URL에 토큰이 포함되지 않았습니다.");
                 Alert.alert("로그인 실패", "토큰을 가져오지 못했습니다.");
             }
-        } else
-        {
+        } else {
+            if (Constants.expoConfig?.extra?.ENV === 'preview') {
+                Alert.alert(
+                    '디버그 정보', 
+                    `인증 타입: ${result.type}`,
+                    [{ text: '확인' }],
+                    { cancelable: true }
+                );
+            }
             console.error("WebBrowser 세션 종료 실패");
             Alert.alert("로그인 실패", "인증 과정에서 문제가 발생했습니다.");
         }
