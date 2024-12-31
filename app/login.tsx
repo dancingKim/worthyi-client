@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, StyleSheet, Image, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Image, SafeAreaView, ActivityIndicator } from "react-native";
 import SocialLoginButton from '@/components/buttons/SocialLoginButton'
 import { handleSocialLogin } from '@/utils/api';
 import { useAuth } from "@/context/AuthContext";
@@ -7,14 +7,28 @@ import { FontFamily } from '@/constants/Fonts';
 
 const LoginScreen: React.FC = () => {
     const { login } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async (provider: string) => {
         try {
+            setIsLoading(true);
             await handleSocialLogin(provider, login);
         } catch (error) {
             console.error('Login failed:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View style={styles.contentContainer}>
+                    <ActivityIndicator size="large" color="#FF69B4" />
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.container}>

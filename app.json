@@ -31,7 +31,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/Worthy-I-logo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.worthyi.worthyi"

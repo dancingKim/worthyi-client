@@ -228,7 +228,16 @@ export default function HomeScreen() {
         }
     }, [adultData]);
 
-    const completePraise = () => {
+    const completePraise = async () => {
+        if (adultActionInput.trim() !== '') {
+            try {
+                await addAdultAction();
+            } catch (err) {
+                Alert.alert('오류', '칭찬 내용을 전송하는 중 문제가 발생했습니다.');
+                return;
+            }
+        }
+        
         setModalVisible(false);
         setAdultActionInput('');
         setSelectedItemId('');
@@ -239,35 +248,38 @@ export default function HomeScreen() {
     const bottomPadding = insets.bottom + (screenHeight * 0.3); // 화면 높이의 12% 정도를 패딩으로 설정
 
     return (
-
-
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
                 style={styles.container}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
             >
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                <View style={styles.mainScreen}>
-                    <View style={styles.fixedContent}>
-                        <SpeechBubble
-                            title="오늘은 이런 점이 감사했어요"
-                            placeholder="아이 입장에서 감사를 들려주세요"
-                            value={childActionContent}
-                            onChangeText={setChildActionContent}
-                            onPress={addChildAction}
-                            buttonText="어른인 내게 감사 들려주기"
-                        />
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                    <View style={styles.mainScreen}>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.topPadding} />
+                            <View style={styles.speechBubbleContainer}>
+                                <SpeechBubble
+                                    title="오늘은 이런 점이 감사했어요"
+                                    placeholder="아이 입장에서 감사를 들려주세요"
+                                    value={childActionContent}
+                                    onChangeText={setChildActionContent}
+                                    onPress={addChildAction}
+                                    buttonText="어른인 내게 감사 들려주기"
+                                />
+                            </View>
 
-                        <View style={styles.avatarContainer}>
-                            <Image
-                                source={require('@/assets/images/avatar-girl.jpeg')}
-                                style={styles.avatarImage}
-                            />
+                            <View style={styles.avatarContainer}>
+                                <Image
+                                    source={require('@/assets/images/avatar-girl.jpeg')}
+                                    style={styles.avatarImage}
+                                />
+                            </View>
+
+                            <View style={styles.spacer} />
                         </View>
                     </View>
-                </View>
-                 </TouchableWithoutFeedback>
+                </TouchableWithoutFeedback>
 
                 <Animated.View
                     style={[
@@ -285,20 +297,22 @@ export default function HomeScreen() {
                         },
                     ]}
                 >
-                        <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
-                            <View style={styles.swipeBar}></View>
+                    <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
+                        <View style={styles.swipeBar}></View>
+                    </View>
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                        <View>
+                            <Text style={[styles.childActionListTitle, CommonStyles.heading2]}>
+                                감사를 <Text style={styles.emphasizedText}>꾹 눌러</Text> 칭찬해 주기
+                            </Text>
+                            <ChildActionList
+                                childActionList={childActionList}
+                                isFlatListScrollable={isFlatListScrollable}
+                                onLongPressItem={handleLongPressItem}
+                                contentContainerStyle={{paddingBottom: bottomPadding}}
+                            />
                         </View>
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View>
-                        <Text style={[styles.childActionListTitle, CommonStyles.heading2]}>감사를 꾹 눌러 칭찬해 주기</Text>
-                        <ChildActionList
-                            childActionList={childActionList}
-                            isFlatListScrollable={isFlatListScrollable}
-                            onLongPressItem={handleLongPressItem}
-                            contentContainerStyle={{paddingBottom: bottomPadding}}
-                        />
-        </View>
-                 </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback>
                 </Animated.View>
             </KeyboardAvoidingView>
 
@@ -308,32 +322,32 @@ export default function HomeScreen() {
                 animationType="slide"
                 onRequestClose={() => setModalVisible(false)}
             >
-                     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                <View style={styles.modalBackground}>
-                    <View style={styles.modalContainer}>
-                        <Text style={[styles.modalTitle, CommonStyles.heading2]}>칭찬을 입력해주세요</Text>
-                        <View style={styles.adultActionInputContainer}>
-                            <TextInput
-                                style={styles.adultActionTextInput}
-                                placeholder="칭찬을 입력하세요"
-                                value={adultActionInput}
-                                onChangeText={setAdultActionInput}
-                                multiline
-                                textAlignVertical="top"
-                                scrollEnabled={true}
-                                editable={true}
-                                keyboardType="default"
-                            />
-                            <TouchableOpacity onPress={addAdultAction}>
-                                <AntDesign name="pluscircleo" size={30} color="black" />
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                    <View style={styles.modalBackground}>
+                        <View style={styles.modalContainer}>
+                            <Text style={[styles.modalTitle, CommonStyles.heading2]}>내가 칭찬해줄게</Text>
+                            <View style={styles.adultActionInputContainer}>
+                                <TextInput
+                                    style={styles.adultActionTextInput}
+                                    placeholder="어른인 내가 칭찬을 해줘요"
+                                    value={adultActionInput}
+                                    onChangeText={setAdultActionInput}
+                                    multiline
+                                    textAlignVertical="top"
+                                    scrollEnabled={true}
+                                    editable={true}
+                                    keyboardType="default"
+                                />
+                                <TouchableOpacity onPress={addAdultAction}>
+                                    <AntDesign name="pluscircleo" size={30} color="black" />
+                                </TouchableOpacity>
+                            </View>
+                            <TouchableOpacity style={styles.button} onPress={completePraise}>
+                                <Text style={[styles.buttonText, CommonStyles.button]}>칭찬 완료</Text>
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.button} onPress={completePraise}>
-                            <Text style={[styles.buttonText, CommonStyles.button]}>칭찬 완료</Text>
-                        </TouchableOpacity>
                     </View>
-                </View>
-                    </TouchableWithoutFeedback>
+                </TouchableWithoutFeedback>
             </Modal>
         </SafeAreaView>
     );
@@ -347,8 +361,30 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    fixedContent: {
-        alignItems: 'center',
+    contentContainer: {
+        flex: 1,
+    },
+    topPadding: {
+        height: '3%',
+    },
+    speechBubbleContainer: {
+        height: '25%',
+        justifyContent: 'center',
+        zIndex: 2,
+    },
+    avatarContainer: {
+        height: '35%',
+        width: '60%',
+        alignSelf: 'center',
+        zIndex: 1,
+    },
+    avatarImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain',
+    },
+    spacer: {
+        height: '37%',
     },
     childActionListScreen: {
         position: 'absolute',
@@ -382,23 +418,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         fontFamily: FontFamily.bold,
     },
-    avatarContainer: {
-        width: '60%',
-        // 말풍선과의 거리 조절
-        marginTop: 0,
-        
-        // 원하는 비율값으로 조절 (예: 16:9)
-        aspectRatio: 1 / 1,
-
-        // 세로로 늘어났을 때 혹은 줄어들었을 때 중앙 정렬
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    avatarImage: {
-        width: '100%',
-        height: '100%',
-        resizeMode: 'contain',
-    },
     modalBackground: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -410,7 +429,7 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         padding: 20,
         width: '80%',
-    alignItems: 'center',
+        alignItems: 'center',
     },
     modalTitle: {
         fontSize: 18,
@@ -447,5 +466,9 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontFamily: FontFamily.medium,
+    },
+    emphasizedText: {
+        color: '#FF69B4',
+        fontFamily: FontFamily.bold,
     },
 });
