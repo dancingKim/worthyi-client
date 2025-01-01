@@ -295,47 +295,47 @@ export default function HomeScreen() {
         <SafeAreaView style={styles.safeArea}>
             <View style={styles.container}>
                 <View style={styles.mainScreen}>
-                    <View style={styles.topPadding} />
-                    <View style={styles.speechBubbleContainer}>
-                        <SpeechBubble
-                            title="오늘은 이런 점이 감사했어요"
-                            placeholder="아이 입장에서 감사를 들려주세요"
-                            value={childActionContent}
-                            onChangeText={setChildActionContent}
-                            onPress={addChildAction}
-                            buttonText="어른인 내게 감사 들려주기"
-                        />
-                    </View>
-
-                    <View style={styles.avatarContainer}>
-                        <Image
-                            source={require('@/assets/images/avatar-girl.jpeg')}
-                            style={styles.avatarImage}
-                        />
-                    </View>
-
-                    <View style={styles.spacer} />
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <View style={styles.mainContent}>
+                            <View style={styles.topPadding} />
+                            <View style={styles.speechBubbleContainer}>
+                                <SpeechBubble
+                                    title="오늘은 이런 점이 감사했어요"
+                                    placeholder="아이 입장에서 감사를 들려주세요"
+                                    value={childActionContent}
+                                    onChangeText={setChildActionContent}
+                                    onPress={addChildAction}
+                                    buttonText="어른인 내게 감사 들려주기"
+                                />
+                            </View>
+                            <View style={styles.avatarContainer}>
+                                <Image
+                                    source={require('@/assets/images/avatar-girl.jpeg')}
+                                    style={styles.avatarImage}
+                                />
+                            </View>
+                            <View style={styles.spacer} />
+                        </View>
+                    </TouchableWithoutFeedback>
                 </View>
 
                 <Animated.View
-                    style={[
-                        styles.childActionListScreen,
-                        {
-                            transform: [{
-                                translateY: animatedValue.interpolate({
-                                    inputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
-                                    outputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
-                                    extrapolate: 'clamp',
-                                }),
-                            }],
-                        },
-                    ]}
+                    style={[styles.childActionListScreen, {
+                        transform: [{
+                            translateY: animatedValue.interpolate({
+                                inputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
+                                outputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
+                                extrapolate: 'clamp',
+                            }),
+                        }],
+                    }]}
                 >
                     <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
-                        <View style={styles.swipeBar}></View>
+                        <View style={styles.swipeBar} />
                     </View>
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                        <View>
+                    
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <View style={styles.listContent}>
                             <Text style={[styles.childActionListTitle, CommonStyles.heading2]}>
                                 감사를 <Text style={styles.emphasizedText}>꾹 눌러</Text> 칭찬해 주기
                             </Text>
@@ -604,5 +604,11 @@ const styles = StyleSheet.create({
         color: '#333',
         lineHeight: 20,
         fontFamily: FontFamily.regular,
+    },
+    mainContent: {
+        flex: 1,
+    },
+    listContent: {
+        flex: 1,
     },
 });
