@@ -74,12 +74,13 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
 const styles = StyleSheet.create({
     speechBubbleContainer: {
         alignItems: 'center',
-        marginVertical: 20,
+        marginVertical: 5,
         width: '100%',
+        paddingBottom: 20,
     },
     speechBubble: {
         borderRadius: 20,
-        padding: 15,
+        padding: 10,
         width: '90%',
         maxWidth: 400,
         alignSelf: 'center',
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 10,
+        marginBottom: 8,
         gap: 8,
     },
     title: {
@@ -103,15 +104,15 @@ const styles = StyleSheet.create({
     },
     inputContainer: {
         position: 'relative',
-        marginBottom: 15,
+        marginBottom: 12,
     },
     textInputFixed: {
-        height: 100,
+        height: 65,
         backgroundColor: '#fff',
         borderRadius: 15,
         paddingHorizontal: 15,
-        paddingTop: 12,
-        paddingBottom: 12,
+        paddingTop: 10,
+        paddingBottom: 10,
         fontSize: 16,
         color: '#333',
         borderWidth: 1,
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
     },
     gradientButton: {
         borderRadius: 25,
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingHorizontal: 25,
     },
     button: {
@@ -141,6 +142,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     triangleDown: {
+        position: 'absolute',
+        bottom: 0,
         width: 0,
         height: 0,
         backgroundColor: 'transparent',
@@ -151,7 +154,6 @@ const styles = StyleSheet.create({
         borderLeftColor: 'transparent',
         borderRightColor: 'transparent',
         borderTopColor: '#FAF0E6',
-        transform: [{ translateY: -1 }],
     },
 });
 

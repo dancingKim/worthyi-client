@@ -441,19 +441,20 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
+    mainContent: {
+        flex: 1,
+    },
     topPadding: {
         height: LAYOUT_HEIGHTS.TOP_PADDING,
     },
     speechBubbleContainer: {
         height: LAYOUT_HEIGHTS.SPEECH_BUBBLE,
         justifyContent: 'center',
-        zIndex: 2,
     },
     avatarContainer: {
         height: LAYOUT_HEIGHTS.AVATAR,
         width: SCREEN_WIDTH * 0.6,
         alignSelf: 'center',
-        zIndex: 1,
     },
     avatarImage: {
         width: '100%',
@@ -604,9 +605,6 @@ const styles = StyleSheet.create({
         color: '#333',
         lineHeight: 20,
         fontFamily: FontFamily.regular,
-    },
-    mainContent: {
-        flex: 1,
     },
     listContent: {
         flex: 1,
