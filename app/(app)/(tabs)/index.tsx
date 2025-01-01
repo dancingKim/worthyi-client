@@ -241,8 +241,7 @@ export default function HomeScreen() {
             try {
                 await addAdultAction();
             } catch (err) {
-                Alert.alert('오류', '칭찬 내용을 전송하는 중 문제가 발생했습니다.');
-                return;
+                console.error('칭찬 내용을 전송하는 중 문제가 발생했습니다:', err);
             }
         }
         
@@ -330,58 +329,74 @@ export default function HomeScreen() {
                 animationType="slide"
                 onRequestClose={() => setModalVisible(false)}
             >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                    <View style={styles.modalBackground}>
-                        <View style={styles.modalContainer}>
-                            <Text style={[styles.modalTitle, CommonStyles.heading2]}>내가 칭찬해줄게</Text>
-                            
-                            <View style={styles.selectedActionContainer}>
-                                <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
-                                <Text style={styles.selectedActionContent}>
-                                    {selectedChildAction?.childActionContent}
-                                </Text>
-                            </View>
-
-                            {selectedChildAction?.adultActions && selectedChildAction.adultActions.length > 0 && (
-                                <View style={styles.existingActionsContainer}>
-                                    <Text style={styles.existingActionsLabel}>칭찬 해줄게</Text>
-                                    <Text style={styles.existingActionContent}>
-                                        {selectedChildAction.adultActions.map((action, index) => (
-                                            <Text key={index}>
-                                                {action}
-                                                {index < selectedChildAction.adultActions.length - 1 ? ' • ' : ''}
-                                            </Text>
-                                        ))}
-                                    </Text>
-                                </View>
-                            )}
-
-                            <View style={styles.adultActionInputContainer}>
-                                <TextInput
-                                    style={styles.adultActionTextInput}
-                                    placeholder="어른인 내가 칭찬을 해줘요"
-                                    value={adultActionInput}
-                                    onChangeText={setAdultActionInput}
-                                    multiline
-                                    textAlignVertical="top"
-                                />
-                                <TouchableOpacity 
-                                    style={styles.addButton} 
-                                    onPress={addAdultAction}
+                <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={styles.modalBackground}
+                >
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                        <View style={styles.modalContent}>
+                            <View style={styles.modalContainer}>
+                                <ScrollView 
+                                    style={styles.modalScrollView}
+                                    keyboardShouldPersistTaps="handled"
                                 >
-                                    <AntDesign name="pluscircleo" size={30} color="black" />
-                                </TouchableOpacity>
+                                    <Text style={[styles.modalTitle, CommonStyles.heading2]}>
+                                        내가 칭찬해줄게
+                                    </Text>
+                                    
+                                    <View style={styles.selectedActionContainer}>
+                                        <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
+                                        <Text style={styles.selectedActionContent}>
+                                            {selectedChildAction?.childActionContent}
+                                        </Text>
+                                    </View>
+
+                                    {selectedChildAction?.adultActions && selectedChildAction.adultActions.length > 0 && (
+                                        <View style={styles.existingActionsContainer}>
+                                            <Text style={styles.existingActionsLabel}>칭찬 해줄게</Text>
+                                            <Text style={styles.existingActionContent}>
+                                                {selectedChildAction.adultActions.map((action, index) => (
+                                                    <Text key={index}>
+                                                        {action}
+                                                        {index < selectedChildAction.adultActions.length - 1 ? ' • ' : ''}
+                                                    </Text>
+                                                ))}
+                                            </Text>
+                                        </View>
+                                    )}
+                                </ScrollView>
+
+                                <View style={styles.modalBottomContainer}>
+                                    <View style={styles.adultActionInputContainer}>
+                                        <TextInput
+                                            style={styles.adultActionTextInput}
+                                            placeholder="어른인 내가 칭찬을 해줘요"
+                                            value={adultActionInput}
+                                            onChangeText={setAdultActionInput}
+                                            multiline
+                                            textAlignVertical="top"
+                                        />
+                                        <TouchableOpacity 
+                                            style={styles.addButton} 
+                                            onPress={addAdultAction}
+                                        >
+                                            <AntDesign name="pluscircleo" size={30} color="black" />
+                                        </TouchableOpacity>
+                                    </View>
+                                    
+                                    <TouchableOpacity 
+                                        style={styles.completeButton} 
+                                        onPress={completePraise}
+                                    >
+                                        <Text style={[styles.buttonText, CommonStyles.button]}>
+                                            완료
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-                            
-                            <TouchableOpacity 
-                                style={styles.completeButton} 
-                                onPress={() => setModalVisible(false)}
-                            >
-                                <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
-                            </TouchableOpacity>
                         </View>
-                    </View>
-                </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback>
+                </KeyboardAvoidingView>
             </Modal>
         </SafeAreaView>
     );
@@ -458,13 +473,30 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    modalContent: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     modalContainer: {
         backgroundColor: '#fff',
         borderRadius: 15,
-        padding: 20,
         width: '90%',
         maxHeight: '80%',
-        alignItems: 'center',
+        paddingTop: 20,
+    },
+    modalScrollView: {
+        maxHeight: '80%',
+        paddingHorizontal: 20,
+    },
+    modalBottomContainer: {
+        padding: 20,
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+        backgroundColor: '#fff',
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
     },
     modalTitle: {
         fontSize: 18,
