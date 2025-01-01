@@ -26,46 +26,48 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                                                    }) => {
     return (
         <View style={styles.speechBubbleContainer}>
-            <LinearGradient
-                colors={['#FFE4E1', '#FAF0E6']}
-                style={styles.speechBubble}
-            >
-                {showTitle && (
-                    <View style={styles.titleContainer}>
-                        <Ionicons name="heart" size={20} color="#FF69B4" />
-                        <Text style={[styles.title, { fontFamily: FontFamily.bold }]}>{title}</Text>
-                    </View>
-                )}
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={[styles.textInputFixed, { fontFamily: FontFamily.regular }]}
-                        placeholder={placeholder}
-                        placeholderTextColor="#999"
-                        value={value}
-                        onChangeText={onChangeText}
-                        multiline
-                        textAlignVertical="top"
-                        maxLength={200}
-                        scrollEnabled={true}
-                        editable={true}
-                        // autoCorrect={false}
-                        // keyboardType="default"
-                    />
-                    <Text style={styles.charCount}>{value.length}/200</Text>
-                </View>
-                <TouchableOpacity 
-                    style={styles.button} 
-                    onPress={onPress}
-                    activeOpacity={0.8}
+            <View style={styles.shadowContainer}>
+                <LinearGradient
+                    colors={['#FFE4E1', '#FAF0E6']}
+                    style={styles.speechBubble}
                 >
-                    <LinearGradient
-                        colors={['#FF69B4', '#FF1493']}
-                        style={styles.gradientButton}
+                    {showTitle && (
+                        <View style={styles.titleContainer}>
+                            <Ionicons name="heart" size={20} color="#FF69B4" />
+                            <Text style={[styles.title, { fontFamily: FontFamily.bold }]}>{title}</Text>
+                        </View>
+                    )}
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={[styles.textInputFixed, { fontFamily: FontFamily.regular }]}
+                            placeholder={placeholder}
+                            placeholderTextColor="#999"
+                            value={value}
+                            onChangeText={onChangeText}
+                            multiline
+                            textAlignVertical="top"
+                            maxLength={200}
+                            scrollEnabled={true}
+                            editable={true}
+                            // autoCorrect={false}
+                            // keyboardType="default"
+                        />
+                        <Text style={styles.charCount}>{value.length}/200</Text>
+                    </View>
+                    <TouchableOpacity 
+                        style={styles.button} 
+                        onPress={onPress}
+                        activeOpacity={0.8}
                     >
-                        <Text style={[styles.buttonText, { fontFamily: FontFamily.semiBold }]}>{buttonText}</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
-            </LinearGradient>
+                        <LinearGradient
+                            colors={['#FF69B4', '#FF1493']}
+                            style={styles.gradientButton}
+                        >
+                            <Text style={[styles.buttonText, { fontFamily: FontFamily.semiBold }]}>{buttonText}</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
+                </LinearGradient>
+            </View>
             <View style={styles.triangleDown} />
         </View>
     );
@@ -74,21 +76,25 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
 const styles = StyleSheet.create({
     speechBubbleContainer: {
         alignItems: 'center',
-        marginVertical: 5,
         width: '100%',
-        paddingBottom: 20,
+        marginVertical: 5,
     },
-    speechBubble: {
-        borderRadius: 20,
-        padding: 10,
+    shadowContainer: {
         width: '90%',
         maxWidth: 400,
-        alignSelf: 'center',
+        borderRadius: 20,
+        backgroundColor: '#fff',
         elevation: 5,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
+    },
+    speechBubble: {
+        borderRadius: 20,
+        padding: 10,
+        width: '100%',
+        overflow: 'hidden',
     },
     titleContainer: {
         flexDirection: 'row',
@@ -142,8 +148,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     triangleDown: {
-        position: 'absolute',
-        bottom: 0,
         width: 0,
         height: 0,
         backgroundColor: 'transparent',

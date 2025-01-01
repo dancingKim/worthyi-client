@@ -310,7 +310,7 @@ export default function HomeScreen() {
                             </View>
                             <View style={styles.avatarContainer}>
                                 <Image
-                                    source={require('@/assets/images/avatar-girl.jpeg')}
+                                    source={require('@/assets/images/avatar-girl-transparent.png')}
                                     style={styles.avatarImage}
                                 />
                             </View>
