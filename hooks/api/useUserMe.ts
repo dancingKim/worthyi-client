@@ -1,7 +1,14 @@
 import Constants from 'expo-constants';
 import { useApiGeneric } from './useApiGeneric';
-import { ApiResponse, UserMeResponse } from '@/types/types';
+import { ApiResponse } from '@/types/types';
 import { getToken } from '@/utils/authStorage';
+
+interface UserMeResponse {
+    id: number;
+    email: string;
+    name: string;
+    // 필요한 다른 사용자 필드들 추가
+}
 
 export const useUserMe = () => {
     const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;

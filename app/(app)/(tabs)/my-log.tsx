@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, ActivityIndicator, Alert, Button, ScrollView, D
 import { useApiGeneric } from '@/hooks/api/useApiGeneric';
 import Constants from 'expo-constants';
 import CalendarWithGratitude from '@/components/CalendarWithGratitude';
-import { ApiResponse, ActionLogResponse } from '@/types/types';
+import { ApiResponse, ActionLogResponse, ActionResponse } from '@/types/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommonStyles } from '@/constants/Styles';
@@ -52,7 +52,7 @@ export default function MyLogScreen() {
 
   // 감사한 날짜 목록: 데이터가 없으면 빈 배열
   const gratitudeDates = dailyLogs?.map(log => log.date) || [];
-  const actions = dailyLogs?.[0]?.actions || [];
+  const actions = dailyLogs?.[0]?.actions || [] as ActionResponse[];
   
   // 화면 크기에 따른 동적 패딩 계산
   const screenHeight = Dimensions.get('window').height;
@@ -119,9 +119,9 @@ export default function MyLogScreen() {
               </Text>
               <Text style={[styles.adultAction, { fontFamily: FontFamily.regular }]}>
                 칭찬: {(action.responses || [])
-                    .map(response => response.content.text)
-                    .filter(Boolean)
-                    .join(' • ')}
+                  .map(response => response.content.text)
+                  .filter(Boolean)
+                  .join(' • ')}
               </Text>
             </View>
           )}

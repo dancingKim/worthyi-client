@@ -18,23 +18,25 @@ import {
     Modal,
     Alert,
     ScrollView,
-    FlatList
+    FlatList,
 } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import { useApiGeneric } from '@/hooks/api/useApiGeneric';
 import Constants from 'expo-constants';
 import SpeechBubble from '@/components/SpeechBubble';
 import ChildActionList from '@/components/ChildActionList';
 import {
-    ChildActionItem,
     ApiResponse,
     ActionResponse,
-    AdultActionResponse,
-    AddAdultActionRequest
+    DeleteResponse,
+    AddAdultActionRequest,
+    ActionContent
 } from '@/types/types';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
+import AdultActionList from '@/components/AdultActionList';
 
 
 
@@ -63,17 +65,16 @@ const LAYOUT_HEIGHTS = {
 
 interface DateResponse extends ApiResponse<ActionResponse[]> {}
 
-
 export default function HomeScreen() {
     const insets = useSafeAreaInsets();
     const [childActionContent, setChildActionContent] = useState<string>('');
-    const [childActionList, setChildActionList] = useState<ChildActionItem[]>([]);
+    const [childActionList, setChildActionList] = useState<ActionResponse[]>([]);
     const [isFlatListScrollable, setIsFlatListScrollable] = useState(true);
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [selectedItemId, setSelectedItemId] = useState<string>('');
     const [adultActionInput, setAdultActionInput] = useState<string>('');
-    const [selectedChildAction, setSelectedChildAction] = useState<ChildActionItem | null>(null);
+    const [selectedChildAction, setSelectedChildAction] = useState<ActionResponse | null>(null);
 
     // 날짜 포맷 함수 예시
     function formatDate(date: Date): string {
@@ -89,13 +90,13 @@ export default function HomeScreen() {
     const currentPosition = useRef(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
     const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
-    const { data, isLoading, error, execute } = useApiGeneric<{ childActionContent: string }, ApiResponse<ActionResponse>>({
+    const { data, isLoading, error, execute } = useApiGeneric<{ content: ActionContent }, ApiResponse<ActionResponse>>({
         condition: true,
         method: 'POST',
         url: `${BASE_URL}/action/child`
     });
 
-    const { data: adultData, isLoading: adultIsLoading, error: adultError, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<AdultActionResponse>>({
+    const { data: adultData, isLoading: adultIsLoading, error: adultError, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<ActionResponse>>({
         condition: true,
         method: 'POST',
         url: `${BASE_URL}/action/adult`
@@ -107,6 +108,18 @@ export default function HomeScreen() {
         url: `${BASE_URL}/action?date=${selectedDate}`
     });
 
+    const { execute: executeDeleteChild } = useApiGeneric<null, DeleteResponse>({
+        condition: true,
+        method: 'DELETE',
+        url: `${BASE_URL}/action/child`
+    });
+
+    const { execute: executeDeleteAdult } = useApiGeneric<null, DeleteResponse>({
+        condition: true,
+        method: 'DELETE',
+        url: `${BASE_URL}/action/adult`
+    });
+
     useEffect(() => {
         // selectedDate가 변경될 때마다 해당 날짜의 데이터를 fetch
         (async () => {
@@ -116,12 +129,7 @@ export default function HomeScreen() {
 
     useEffect(() => {
         if (dateData?.data) {
-            const actionList: ChildActionItem[] = dateData.data.map(item => ({
-                childActionId: item.id,
-                content: item.content,
-                adultActions: item.responses || []
-            }));
-            setChildActionList(actionList);
+            setChildActionList(dateData.data);
         }
     }, [dateData]);
 
@@ -187,7 +195,8 @@ export default function HomeScreen() {
             try {
                 await execute({ 
                     content: {
-                        text: childActionContent
+                        text: childActionContent,
+                        imageUrl: null
                     }
                 });
             } catch (err) {
@@ -196,8 +205,8 @@ export default function HomeScreen() {
         }
     };
 
-    const handleLongPressItem = (item: ChildActionItem) => {
-        setSelectedItemId(item.childActionId.toString());
+    const handleLongPressItem = (item: ActionResponse) => {
+        setSelectedItemId(item.id.toString());
         setSelectedChildAction(item);
         setModalVisible(true);
     };
@@ -214,21 +223,22 @@ export default function HomeScreen() {
             try {
                 await adultExecute({
                     content: {
-                        text: adultActionInput
+                        text: adultActionInput,
+                        imageUrl: null
                     },
-                    childActionId: childActionIdNum
+                    actionId: childActionIdNum
                 });
                 
                 // 로컬 상태 업데이트
                 if (selectedChildAction) {
                     setSelectedChildAction({
                         ...selectedChildAction,
-                        adultActions: [
-                            ...selectedChildAction.adultActions,
+                        responses: [
+                            ...(selectedChildAction.responses || []),
                             {
                                 id: Date.now(), // 임시 ID
-                                childActionId: childActionIdNum,
-                                content: { text: adultActionInput }
+                                content: { text: adultActionInput },
+                                responses: []
                             }
                         ]
                     });
@@ -242,12 +252,7 @@ export default function HomeScreen() {
 
     useEffect(() => {
         if (data?.data) {
-            const childActionData = data.data;
-            const newChildAction: ChildActionItem = {
-                childActionId: childActionData.id,
-                content: childActionData.content,
-                adultActions: childActionData.responses || []
-            };
+            const newChildAction = data.data;
             setChildActionList(prevList => [newChildAction, ...prevList]);
             setChildActionContent('');
         }
@@ -257,14 +262,17 @@ export default function HomeScreen() {
         if (adultData?.data) {
             const adultActionData = adultData.data;
             setChildActionList(prevList => prevList.map(item => {
-                if (item.childActionId === adultActionData.childActionId) {
+                if (item.id === parseInt(selectedItemId)) {
                     return {
                         ...item,
-                        adultActions: [...item.adultActions, {
-                            id: adultActionData.id,
-                            childActionId: adultActionData.childActionId,
-                            content: adultActionData.content
-                        }]
+                        responses: [
+                            ...(item.responses || []),
+                            {
+                                id: adultActionData.id,
+                                content: adultActionData.content,
+                                responses: []
+                            }
+                        ]
                     };
                 }
                 return item;
@@ -287,145 +295,169 @@ export default function HomeScreen() {
         setSelectedItemId('');
     };
 
+    const handleDeleteChildAction = async (id: number) => {
+        try {
+            await executeDeleteChild(null, `${BASE_URL}/action/child/${id}`);
+            setChildActionList(prev => prev.filter(item => item.id !== id));
+        } catch (error) {
+            console.error('아동 행동 삭제 실패:', error);
+            Alert.alert('삭제 실패', '다시 시도해주세요.');
+        }
+    };
+
+    const handleDeleteAdultAction = async (id: number) => {
+        try {
+            await executeDeleteAdult(null, `${BASE_URL}/action/adult/${id}`);
+            if (selectedChildAction) {
+                setSelectedChildAction({
+                    ...selectedChildAction,
+                    responses: selectedChildAction.responses?.filter(item => item.id !== id) || []
+                });
+            }
+        } catch (error) {
+            console.error('어른 행동 삭제 실패:', error);
+            Alert.alert('삭제 실패', '다시 시도해주세요.');
+        }
+    };
+
     // 화면 크기에 따른 동적 패딩 계산
     const screenHeight = Dimensions.get('window').height;
     const bottomPadding = insets.bottom + (screenHeight * 0.3); // 화면 높이의 12% 정도를 패딩으로 설정
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
-                <View style={styles.mainScreen}>
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <View style={styles.mainContent}>
-                            <View style={styles.topPadding} />
-                            <View style={styles.speechBubbleContainer}>
-                                <SpeechBubble
-                                    title="오늘은 이런 점이 감사했어요"
-                                    placeholder="아이 입장에서 감사를 들려주세요"
-                                    value={childActionContent}
-                                    onChangeText={setChildActionContent}
-                                    onPress={addChildAction}
-                                    buttonText="어른인 내게 감사 들려주기"
-                                />
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaView style={styles.safeArea}>
+                <View style={styles.container}>
+                    <View style={styles.mainScreen}>
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View style={styles.mainContent}>
+                                <View style={styles.topPadding} />
+                                <View style={styles.speechBubbleContainer}>
+                                    <SpeechBubble
+                                        title="오늘은 이런 점이 감사했어요"
+                                        placeholder="아이 입장에서 감사를 들려주세요"
+                                        value={childActionContent}
+                                        onChangeText={setChildActionContent}
+                                        onPress={addChildAction}
+                                        buttonText="어른인 내게 감사 들려주기"
+                                    />
+                                </View>
+                                <View style={styles.avatarContainer}>
+                                    <Image
+                                        source={require('@/assets/images/avatar-girl-transparent.png')}
+                                        style={styles.avatarImage}
+                                    />
+                                </View>
+                                <View style={styles.spacer} />
                             </View>
-                            <View style={styles.avatarContainer}>
-                                <Image
-                                    source={require('@/assets/images/avatar-girl-transparent.png')}
-                                    style={styles.avatarImage}
-                                />
-                            </View>
-                            <View style={styles.spacer} />
+                        </TouchableWithoutFeedback>
+                    </View>
+
+                    <Animated.View
+                        style={[styles.childActionListScreen, {
+                            transform: [{
+                                translateY: animatedValue.interpolate({
+                                    inputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
+                                    outputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
+                                    extrapolate: 'clamp',
+                                }),
+                            }],
+                        }]}
+                    >
+                        <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
+                            <View style={styles.swipeBar} />
                         </View>
-                    </TouchableWithoutFeedback>
+                        
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View style={styles.listContent}>
+                                <Text style={[styles.childActionListTitle, CommonStyles.heading2]}>
+                                    감사를 <Text style={styles.emphasizedText}>꾹 눌러</Text> 칭찬해 주기
+                                </Text>
+                                <ChildActionList
+                                    childActionList={childActionList}
+                                    isFlatListScrollable={isFlatListScrollable}
+                                    onLongPressItem={handleLongPressItem}
+                                    onDeleteItem={handleDeleteChildAction}
+                                    contentContainerStyle={{paddingBottom: bottomPadding}}
+                                />
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </Animated.View>
                 </View>
 
-                <Animated.View
-                    style={[styles.childActionListScreen, {
-                        transform: [{
-                            translateY: animatedValue.interpolate({
-                                inputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
-                                outputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
-                                extrapolate: 'clamp',
-                            }),
-                        }],
-                    }]}
+                <Modal
+                    visible={modalVisible}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={() => setModalVisible(false)}
                 >
-                    <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
-                        <View style={styles.swipeBar} />
-                    </View>
-                    
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <View style={styles.listContent}>
-                            <Text style={[styles.childActionListTitle, CommonStyles.heading2]}>
-                                감사를 <Text style={styles.emphasizedText}>꾹 눌러</Text> 칭찬해 주기
-                            </Text>
-                            <ChildActionList
-                                childActionList={childActionList}
-                                isFlatListScrollable={isFlatListScrollable}
-                                onLongPressItem={handleLongPressItem}
-                                contentContainerStyle={{paddingBottom: bottomPadding}}
-                            />
-                        </View>
-                    </TouchableWithoutFeedback>
-                </Animated.View>
-            </View>
-
-            <Modal
-                visible={modalVisible}
-                transparent={true}
-                animationType="slide"
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <KeyboardAvoidingView 
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    style={styles.modalBackground}
-                >
-                    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                        <View style={styles.modalContent}>
-                            <View style={styles.modalContainer}>
-                                <ScrollView 
-                                    style={styles.modalScrollView}
-                                    keyboardShouldPersistTaps="handled"
-                                >
-                                    <Text style={[styles.modalTitle, CommonStyles.heading2]}>
-                                        내가 칭찬해줄게
-                                    </Text>
-                                    
-                                    <View style={styles.selectedActionContainer}>
-                                        <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
-                                        <Text style={styles.selectedActionContent}>
-                                            {selectedChildAction?.content.text}
+                    <KeyboardAvoidingView 
+                        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                        style={styles.modalBackground}
+                    >
+                        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                            <View style={styles.modalContent}>
+                                <View style={styles.modalContainer}>
+                                    <ScrollView 
+                                        style={styles.modalScrollView}
+                                        keyboardShouldPersistTaps="handled"
+                                    >
+                                        <Text style={[styles.modalTitle, CommonStyles.heading2]}>
+                                            내가 칭찬해줄게
                                         </Text>
-                                    </View>
-
-                                    {selectedChildAction?.adultActions && selectedChildAction.adultActions.length > 0 && (
-                                        <View style={styles.existingActionsContainer}>
-                                            <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
-                                            <Text style={styles.existingActionContent}>
-                                                {selectedChildAction.adultActions.map((action, index) => (
-                                                    <Text key={index}>
-                                                        {action.content.text}
-                                                        {index < selectedChildAction.adultActions.length - 1 ? ' • ' : ''}
-                                                    </Text>
-                                                ))}
+                                        
+                                        <View style={styles.selectedActionContainer}>
+                                            <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
+                                            <Text style={styles.selectedActionContent}>
+                                                {selectedChildAction?.content.text}
                                             </Text>
                                         </View>
-                                    )}
-                                </ScrollView>
 
-                                <View style={styles.modalBottomContainer}>
-                                    <View style={styles.adultActionInputContainer}>
-                                        <TextInput
-                                            style={styles.adultActionTextInput}
-                                            placeholder="어른인 내가 칭찬을 해줘요"
-                                            value={adultActionInput}
-                                            onChangeText={setAdultActionInput}
-                                            multiline
-                                            textAlignVertical="top"
-                                        />
+                                        {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
+                                            <View style={styles.existingActionsContainer}>
+                                                <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
+                                                <AdultActionList
+                                                    actions={selectedChildAction.responses}
+                                                    onDeleteAction={handleDeleteAdultAction}
+                                                />
+                                            </View>
+                                        )}
+                                    </ScrollView>
+
+                                    <View style={styles.modalBottomContainer}>
+                                        <View style={styles.adultActionInputContainer}>
+                                            <TextInput
+                                                style={styles.adultActionTextInput}
+                                                placeholder="어른인 내가 칭찬을 해줘요"
+                                                value={adultActionInput}
+                                                onChangeText={setAdultActionInput}
+                                                multiline
+                                                textAlignVertical="top"
+                                            />
+                                            <TouchableOpacity 
+                                                style={styles.addButton} 
+                                                onPress={addAdultAction}
+                                            >
+                                                <AntDesign name="pluscircleo" size={30} color="black" />
+                                            </TouchableOpacity>
+                                        </View>
+                                        
                                         <TouchableOpacity 
-                                            style={styles.addButton} 
-                                            onPress={addAdultAction}
+                                            style={styles.completeButton} 
+                                            onPress={completePraise}
                                         >
-                                            <AntDesign name="pluscircleo" size={30} color="black" />
+                                            <Text style={[styles.buttonText, CommonStyles.button]}>
+                                                완료
+                                            </Text>
                                         </TouchableOpacity>
                                     </View>
-                                    
-                                    <TouchableOpacity 
-                                        style={styles.completeButton} 
-                                        onPress={completePraise}
-                                    >
-                                        <Text style={[styles.buttonText, CommonStyles.button]}>
-                                            완료
-                                        </Text>
-                                    </TouchableOpacity>
                                 </View>
                             </View>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </KeyboardAvoidingView>
-            </Modal>
-        </SafeAreaView>
+                        </TouchableWithoutFeedback>
+                    </KeyboardAvoidingView>
+                </Modal>
+            </SafeAreaView>
+        </GestureHandlerRootView>
     );
 }
 
@@ -599,12 +631,6 @@ const styles = StyleSheet.create({
         color: '#666',
         marginBottom: 8,
         fontFamily: FontFamily.medium,
-    },
-    existingActionContent: {
-        fontSize: 14,
-        color: '#333',
-        lineHeight: 20,
-        fontFamily: FontFamily.regular,
     },
     listContent: {
         flex: 1,

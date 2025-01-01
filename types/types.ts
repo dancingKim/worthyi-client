@@ -1,30 +1,18 @@
 // types/types.ts
 export interface ActionContent {
     text?: string;
-    image?: string | null;
+    imageUrl?: string | null;
 }
 
-export interface ChildActionItem {
-    childActionId: number;
+export interface ActionResponse {
+    id: number;
     content: ActionContent;
-    adultActions: AdultActionResponse[];
-}
-
-export interface ApiResponse<T> {
-    code: number;
-    message: string;
-    data: T | null;
-}
-
-export interface AdultActionResponse {
-    adultActionId: number;
-    childActionId: number;
-    content: ActionContent;
+    responses?: ActionResponse[];
 }
 
 export interface DailyLog {
     date: string;
-    actions: ChildActionItem[];
+    actions: ActionResponse[];
 }
 
 export interface ActionLogResponse {
@@ -34,23 +22,19 @@ export interface ActionLogResponse {
     yearlyCount: number;
 }
 
+export interface ApiResponse<T> {
+    code: number;
+    message: string;
+    data: T | null;
+}
+
+export interface DeleteResponse {
+    code: number;
+    message: string;
+    data: null;
+}
+
 export interface AddAdultActionRequest {
     content: ActionContent;
     childActionId: number;
-}
-
-export interface AddChildActionRequest {
-    content: ActionContent;
-}
-
-interface Avatar {
-    avatarId: number;
-    name: string;
-    appearance: string;
-}
-
-export interface UserMeResponse {
-    email: string;
-    name: string;
-    avatars: Avatar[];
 }

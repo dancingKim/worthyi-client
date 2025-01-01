@@ -9,6 +9,6 @@ export interface ApiHookResult<U> {
     data: U | null;
     isLoading: boolean;
     error: any;
-    execute: (payload?: any) => Promise<U | null>;
+    execute: (payload?: any, url?: string) => Promise<U | null>;
     response: Response | null;
 } 
