@@ -20,16 +20,16 @@ const ChildActionList: React.FC<ChildActionListProps> = ({
                                                          }) => (
     <FlatList
         data={childActionList}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.childActionId.toString()}
         renderItem={({ item }) => (
             <TouchableOpacity onLongPress={() => onLongPressItem(item)}>
                 <View style={styles.childActionItem}>
                     <Text style={[styles.childActionText, { fontFamily: FontFamily.bold }]}>
-                        아이의 감사: {item.childActionContent}
+                        아이의 감사: {item.content.text}
                     </Text>
                     {item.adultActions.length > 0 && (
                         <Text style={[styles.adultActionsText, { fontFamily: FontFamily.medium }]}>
-                            칭찬: {item.adultActions.join(', ')}
+                            칭찬: {item.adultActions.map(action => action.content.text).join(' • ')}
                         </Text>
                     )}
                 </View>

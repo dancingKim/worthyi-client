@@ -36,10 +36,31 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
 
+
+
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const INITIAL_POSITION = SCREEN_HEIGHT * 0.6;
+
+// 플랫폼별 레이아웃 높이 계산
+const LAYOUT_HEIGHTS = {
+    // Android
+    ...(Platform.OS === 'android' ? {
+        TOP_PADDING: SCREEN_HEIGHT * 0.08,     // 0% ~ 8%
+        SPEECH_BUBBLE: SCREEN_HEIGHT * 0.22,    // 8% ~ 30%
+        AVATAR: SCREEN_HEIGHT * 0.30,          // 30% ~ 60%
+        SPACER: SCREEN_HEIGHT * 0.60,          // 시작: 60%
+        INITIAL_LIST_POSITION: SCREEN_HEIGHT * 0.60  // 리스트 시작 위치: 60%
+    } : {
+        // iOS
+        TOP_PADDING: SCREEN_HEIGHT * 0.03,     // 0% ~ 3%
+        SPEECH_BUBBLE: SCREEN_HEIGHT * 0.27,    // 3% ~ 30%
+        AVATAR: SCREEN_HEIGHT * 0.30,          // 30% ~ 60% (Android와 동일하게 맞춤)
+        SPACER: SCREEN_HEIGHT * 0.60,          // 시작: 60%
+        INITIAL_LIST_POSITION: SCREEN_HEIGHT * 0.60  // 리스트 시작 위치: 60%
+    })
+};
+
 interface DateResponse extends ApiResponse<ActionResponse[]> {}
 
 
@@ -64,8 +85,8 @@ export default function HomeScreen() {
 
     const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date())); // 예: 기본 날짜
 
-    const animatedValue = useRef(new Animated.Value(INITIAL_POSITION)).current;
-    const currentPosition = useRef(INITIAL_POSITION);
+    const animatedValue = useRef(new Animated.Value(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION)).current;
+    const currentPosition = useRef(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
     const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
     const { data, isLoading, error, execute } = useApiGeneric<{ childActionContent: string }, ApiResponse<ActionResponse>>({
@@ -94,12 +115,11 @@ export default function HomeScreen() {
     }, [selectedDate]);
 
     useEffect(() => {
-        if (dateData && dateData.data) {
+        if (dateData?.data) {
             const actionList: ChildActionItem[] = dateData.data.map(item => ({
-                id: item.childActionId.toString(),
-                childActionContent: item.childActionContent,
-                // adultActions: AdultActionDto.Response[] -> string[]
-                adultActions: item.adultActions.map(a => a.adultActionContent)
+                childActionId: item.id,
+                content: item.content,
+                adultActions: item.responses || []
             }));
             setChildActionList(actionList);
         }
@@ -142,10 +162,10 @@ export default function HomeScreen() {
                 if (gestureState.dy < -50) {
                     animateToPosition(0);
                 } else if (gestureState.dy > 50) {
-                    animateToPosition(INITIAL_POSITION);
+                    animateToPosition(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
                 } else {
                     const destination =
-                        finalPosition < INITIAL_POSITION / 2 ? 0 : INITIAL_POSITION;
+                        finalPosition < LAYOUT_HEIGHTS.INITIAL_LIST_POSITION / 2 ? 0 : LAYOUT_HEIGHTS.INITIAL_LIST_POSITION;
                     animateToPosition(destination);
                 }
             },
@@ -165,7 +185,11 @@ export default function HomeScreen() {
     const addChildAction = async () => {
         if (childActionContent.trim() !== '') {
             try {
-                await execute({ childActionContent: childActionContent });
+                await execute({ 
+                    content: {
+                        text: childActionContent
+                    }
+                });
             } catch (err) {
                 console.error('감사 내용 전송 오류:', err);
             }
@@ -173,7 +197,7 @@ export default function HomeScreen() {
     };
 
     const handleLongPressItem = (item: ChildActionItem) => {
-        setSelectedItemId(item.id);
+        setSelectedItemId(item.childActionId.toString());
         setSelectedChildAction(item);
         setModalVisible(true);
     };
@@ -189,7 +213,9 @@ export default function HomeScreen() {
 
             try {
                 await adultExecute({
-                    adultActionContent: adultActionInput,
+                    content: {
+                        text: adultActionInput
+                    },
                     childActionId: childActionIdNum
                 });
                 
@@ -197,10 +223,17 @@ export default function HomeScreen() {
                 if (selectedChildAction) {
                     setSelectedChildAction({
                         ...selectedChildAction,
-                        adultActions: [...selectedChildAction.adultActions, adultActionInput]
+                        adultActions: [
+                            ...selectedChildAction.adultActions,
+                            {
+                                id: Date.now(), // 임시 ID
+                                childActionId: childActionIdNum,
+                                content: { text: adultActionInput }
+                            }
+                        ]
                     });
                 }
-                setAdultActionInput(''); // 입력 필드 초기화
+                setAdultActionInput('');
             } catch (err) {
                 console.error('칭찬 내용 전송 오류:', err);
             }
@@ -208,12 +241,12 @@ export default function HomeScreen() {
     };
 
     useEffect(() => {
-        if (data && data.data) {
+        if (data?.data) {
             const childActionData = data.data;
             const newChildAction: ChildActionItem = {
-                id: childActionData.childActionId.toString(),
-                childActionContent: childActionData.childActionContent,
-                adultActions: []
+                childActionId: childActionData.id,
+                content: childActionData.content,
+                adultActions: childActionData.responses || []
             };
             setChildActionList(prevList => [newChildAction, ...prevList]);
             setChildActionContent('');
@@ -221,13 +254,17 @@ export default function HomeScreen() {
     }, [data]);
 
     useEffect(() => {
-        if (adultData && adultData.data) {
+        if (adultData?.data) {
             const adultActionData = adultData.data;
             setChildActionList(prevList => prevList.map(item => {
-                if (item.id === adultActionData.childActionId.toString()) {
+                if (item.childActionId === adultActionData.childActionId) {
                     return {
                         ...item,
-                        adultActions: [...item.adultActions, adultActionData.adultActionContent]
+                        adultActions: [...item.adultActions, {
+                            id: adultActionData.id,
+                            childActionId: adultActionData.childActionId,
+                            content: adultActionData.content
+                        }]
                     };
                 }
                 return item;
@@ -255,52 +292,42 @@ export default function HomeScreen() {
     const bottomPadding = insets.bottom + (screenHeight * 0.3); // 화면 높이의 12% 정도를 패딩으로 설정
 
     return (
-        <SafeAreaView style={styles.container}>
-            <KeyboardAvoidingView
-                style={styles.container}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-            >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                    <View style={styles.mainScreen}>
-                        <View style={styles.contentContainer}>
-                            <View style={styles.topPadding} />
-                            <View style={styles.speechBubbleContainer}>
-                                <SpeechBubble
-                                    title="오늘은 이런 점이 감사했어요"
-                                    placeholder="아이 입장에서 감사를 들려주세요"
-                                    value={childActionContent}
-                                    onChangeText={setChildActionContent}
-                                    onPress={addChildAction}
-                                    buttonText="어른인 내게 감사 들려주기"
-                                />
-                            </View>
-
-                            <View style={styles.avatarContainer}>
-                                <Image
-                                    source={require('@/assets/images/avatar-girl.jpeg')}
-                                    style={styles.avatarImage}
-                                />
-                            </View>
-
-                            <View style={styles.spacer} />
-                        </View>
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.container}>
+                <View style={styles.mainScreen}>
+                    <View style={styles.topPadding} />
+                    <View style={styles.speechBubbleContainer}>
+                        <SpeechBubble
+                            title="오늘은 이런 점이 감사했어요"
+                            placeholder="아이 입장에서 감사를 들려주세요"
+                            value={childActionContent}
+                            onChangeText={setChildActionContent}
+                            onPress={addChildAction}
+                            buttonText="어른인 내게 감사 들려주기"
+                        />
                     </View>
-                </TouchableWithoutFeedback>
+
+                    <View style={styles.avatarContainer}>
+                        <Image
+                            source={require('@/assets/images/avatar-girl.jpeg')}
+                            style={styles.avatarImage}
+                        />
+                    </View>
+
+                    <View style={styles.spacer} />
+                </View>
 
                 <Animated.View
                     style={[
                         styles.childActionListScreen,
                         {
-                            transform: [
-                                {
-                                    translateY: animatedValue.interpolate({
-                                        inputRange: [0, INITIAL_POSITION],
-                                        outputRange: [0, INITIAL_POSITION],
-                                        extrapolate: 'clamp',
-                                    }),
-                                },
-                            ],
+                            transform: [{
+                                translateY: animatedValue.interpolate({
+                                    inputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
+                                    outputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
+                                    extrapolate: 'clamp',
+                                }),
+                            }],
                         },
                     ]}
                 >
@@ -321,7 +348,7 @@ export default function HomeScreen() {
                         </View>
                     </TouchableWithoutFeedback>
                 </Animated.View>
-            </KeyboardAvoidingView>
+            </View>
 
             <Modal
                 visible={modalVisible}
@@ -347,17 +374,17 @@ export default function HomeScreen() {
                                     <View style={styles.selectedActionContainer}>
                                         <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
                                         <Text style={styles.selectedActionContent}>
-                                            {selectedChildAction?.childActionContent}
+                                            {selectedChildAction?.content.text}
                                         </Text>
                                     </View>
 
                                     {selectedChildAction?.adultActions && selectedChildAction.adultActions.length > 0 && (
                                         <View style={styles.existingActionsContainer}>
-                                            <Text style={styles.existingActionsLabel}>칭찬 해줄게</Text>
+                                            <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
                                             <Text style={styles.existingActionContent}>
                                                 {selectedChildAction.adultActions.map((action, index) => (
                                                     <Text key={index}>
-                                                        {action}
+                                                        {action.content.text}
                                                         {index < selectedChildAction.adultActions.length - 1 ? ' • ' : ''}
                                                     </Text>
                                                 ))}
@@ -403,6 +430,10 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
     container: {
         flex: 1,
     },
@@ -410,19 +441,16 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    contentContainer: {
-        flex: 1,
-    },
     topPadding: {
-        height: SCREEN_HEIGHT * 0.03,
+        height: LAYOUT_HEIGHTS.TOP_PADDING,
     },
     speechBubbleContainer: {
-        height: SCREEN_HEIGHT * 0.25,
+        height: LAYOUT_HEIGHTS.SPEECH_BUBBLE,
         justifyContent: 'center',
         zIndex: 2,
     },
     avatarContainer: {
-        height: SCREEN_HEIGHT * 0.35,
+        height: LAYOUT_HEIGHTS.AVATAR,
         width: SCREEN_WIDTH * 0.6,
         alignSelf: 'center',
         zIndex: 1,
@@ -433,7 +461,7 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     spacer: {
-        height: SCREEN_HEIGHT * 0.37,
+        height: LAYOUT_HEIGHTS.SPACER,
     },
     childActionListScreen: {
         position: 'absolute',

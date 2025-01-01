@@ -51,8 +51,8 @@ export default function MyLogScreen() {
   const yearlyCount = data?.data?.yearlyCount || 0;
 
   // 감사한 날짜 목록: 데이터가 없으면 빈 배열
-  const gratitudeDates = dailyLogs.map(log => log.date);
-  const actions = dailyLogs.length > 0 ? dailyLogs[0].actions : [];
+  const gratitudeDates = dailyLogs?.map(log => log.date) || [];
+  const actions = dailyLogs?.[0]?.actions || [];
   
   // 화면 크기에 따른 동적 패딩 계산
   const screenHeight = Dimensions.get('window').height;
@@ -111,17 +111,21 @@ export default function MyLogScreen() {
 
         <FlatList
           data={actions}
-          scrollEnabled={false} // FlatList의 스크롤은 비활성화
+          scrollEnabled={false}
           renderItem={({ item: action }) => (
-            <View key={action.childActionId} style={styles.actionContainer}>
+            <View key={action.id} style={styles.actionContainer}>
               <Text style={[styles.actionTitle, { fontFamily: FontFamily.medium }]}>
-                감사: {action.childActionContent}
+                감사: {action.content.text}
               </Text>
               <Text style={[styles.adultAction, { fontFamily: FontFamily.regular }]}>
-                칭찬: {action.adultActions.map(adult => adult.adultActionContent).join(', ')}
+                칭찬: {(action.responses || [])
+                    .map(response => response.content.text)
+                    .filter(Boolean)
+                    .join(' • ')}
               </Text>
             </View>
           )}
+          keyExtractor={item => item.id.toString()}
           ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
               <Text>해당 날짜에 대한 데이터가 없습니다.</Text>

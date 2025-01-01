@@ -1,37 +1,30 @@
 // types/types.ts
+export interface ActionContent {
+    text?: string;
+    image?: string | null;
+}
+
 export interface ChildActionItem {
-    id: string;
-    childActionContent: string;
-    adultActions: string[];
+    childActionId: number;
+    content: ActionContent;
+    adultActions: AdultActionResponse[];
 }
 
 export interface ApiResponse<T> {
     code: number;
     message: string;
-    data: T;
-}
-
-export interface ActionResponse {
-    childActionId: number;
-    childActionContent: string;
-    adultActions: AdultActionResponse[]; // Object[] 대신 AdultActionResponse[]
+    data: T | null;
 }
 
 export interface AdultActionResponse {
     adultActionId: number;
-    adultActionContent: string;
     childActionId: number;
-}
-
-export interface AdultActionItem {
-    id: string;
-    adultActionContent: string;
-    childActionId: string;
+    content: ActionContent;
 }
 
 export interface DailyLog {
     date: string;
-    actions: ActionResponse[];
+    actions: ChildActionItem[];
 }
 
 export interface ActionLogResponse {
@@ -42,8 +35,12 @@ export interface ActionLogResponse {
 }
 
 export interface AddAdultActionRequest {
-    adultActionContent: string;
-    childActionId: number; // 백엔드에서 Long 타입으로 기대
+    content: ActionContent;
+    childActionId: number;
+}
+
+export interface AddChildActionRequest {
+    content: ActionContent;
 }
 
 interface Avatar {
