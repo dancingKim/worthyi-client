@@ -50,7 +50,6 @@ export function useApiGeneric<T = any, U = any>(
             console.log('Response Headers:', response.headers);
 
             if (response.status === 401) {
-                console.log('인증 실패: 로그인 페이지로 이동합니다.');
                 router.replace("/login");
                 throw new Error('인증이 필요합니다.');
             }
@@ -61,10 +60,7 @@ export function useApiGeneric<T = any, U = any>(
                 throw new Error(responseData.message || 'API request failed');
             }
 
-            console.log('Response Data:', responseData);
-
             setData(responseData);
-            console.log('Data set:', data);
             return responseData;
         } catch (err) {
             const error = err as Error;

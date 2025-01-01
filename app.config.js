@@ -16,7 +16,6 @@ const getLocalIpAddress = () => {
 export default ({ config }) => {
     const localIpAddress = getLocalIpAddress();
     const ENV = process.env.NODE_ENV || "development";
-    console.log("Build ENV:", ENV);
     
     const envConfig = {
         development: {

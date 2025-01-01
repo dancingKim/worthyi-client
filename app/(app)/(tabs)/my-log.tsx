@@ -39,8 +39,8 @@ export default function MyLogScreen() {
 
   useEffect(() => {
     if (error) {
-      // 네트워크나 API 요청에 실패해도 알림은 띄우되, UI는 기본 상태 유지
-      Alert.alert('오류', '데이터를 불러오는 중 문제가 발생했습니다. 기본 화면을 표시합니다.');
+      // Alert 제거하고 콘솔 로그만 남김
+      console.error('데이터를 불러오는 중 문제가 발생했습니다:', error);
     }
   }, [error]);
 
@@ -56,24 +56,26 @@ export default function MyLogScreen() {
   
   // 화면 크기에 따른 동적 패딩 계산
   const screenHeight = Dimensions.get('window').height;
-  const bottomPadding = insets.bottom + (screenHeight * 0.05);
+  const bottomPadding = insets.bottom + (screenHeight * 0.12); // 화면 높이의 12% + 하단 안전영역
 
   return (
     <SafeAreaView style={styles.container}>
-      
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={{
+          paddingBottom: bottomPadding // 하단 패딩 추가
+        }}
+      >
         <Text style={[styles.title, CommonStyles.heading1]}>내 감사 로그</Text>
 
-        {/* 캘린더는 항상 표시되며, 데이터 없으면 마크 없는 캘린더 */}
         <CalendarWithGratitude
-            selectedDate={selectedDate}
-            onDateChange={(date) => setSelectedDate(date)}
-            gratitudeDates={gratitudeDates}
+          selectedDate={selectedDate}
+          onDateChange={(date) => setSelectedDate(date)}
+          gratitudeDates={gratitudeDates}
         />
 
-        {/* 로딩 중일 때 로딩 표시 (캘린더 외 UI도 표시되나, 로딩중임을 알림) */}
         {isLoading && <ActivityIndicator size="large" />}
 
-        {/* 통계 정보 섹션 업데이트 */}
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Ionicons name="calendar-outline" size={24} color="#4A90E2" />
@@ -106,35 +108,38 @@ export default function MyLogScreen() {
             setSelectedDate(nextDay);
           }} />
         </View>
-      <FlatList
-        data={actions}
-        renderItem={({ item: action }) => (
+
+        <FlatList
+          data={actions}
+          scrollEnabled={false} // FlatList의 스크롤은 비활성화
+          renderItem={({ item: action }) => (
             <View key={action.childActionId} style={styles.actionContainer}>
-                <Text style={[styles.actionTitle, { fontFamily: FontFamily.medium }]}>
-                    감사: {action.childActionContent}
-                </Text>
-                <Text style={[styles.adultAction, { fontFamily: FontFamily.regular }]}>
-                    칭찬: {action.adultActions.map(adult => adult.adultActionContent).join(', ')}
-                </Text>
+              <Text style={[styles.actionTitle, { fontFamily: FontFamily.medium }]}>
+                감사: {action.childActionContent}
+              </Text>
+              <Text style={[styles.adultAction, { fontFamily: FontFamily.regular }]}>
+                칭찬: {action.adultActions.map(adult => adult.adultActionContent).join(', ')}
+              </Text>
             </View>
-        )}
-        ListEmptyComponent={() => (
+          )}
+          ListEmptyComponent={() => (
             <View style={styles.emptyContainer}>
-                <Text>해당 날짜에 대한 데이터가 없습니다.</Text>
+              <Text>해당 날짜에 대한 데이터가 없습니다.</Text>
             </View>
-        )}
-        contentContainerStyle={{
-            paddingBottom: bottomPadding,
-        }}
-      />
+          )}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
   title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   statsContainer: {
     flexDirection: 'row',

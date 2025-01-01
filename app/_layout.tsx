@@ -8,8 +8,8 @@ import { Stack } from 'expo-router';
 
 // 가장 먼저 실행되도록 파일 최상단에 배치
 SplashScreen.preventAutoHideAsync()
-  .catch(() => {
-    console.warn('Error preventing splash screen auto hide');
+  .catch((err) => {
+    console.error('Error preventing splash screen auto hide:', err);
   });
 
 export default function RootLayout() {
@@ -32,14 +32,16 @@ export default function RootLayout() {
     console.log('Font loading error:', error);  // 에러 로그 추가
     if (loaded) {
       // 폰트 로딩이 완료되면 Splash Screen 숨기기
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(err => {
+        console.error('Error hiding splash screen:', err);
+      });
     }
   }, [loaded, error]);
 
-  // 디버깅을 위한 더 자세한 에러 로깅
+  // 에러 로깅을 console.error로 통일
   useEffect(() => {
     if (error) {
-      console.error('Font loading error details:', error);
+      console.error('Font loading error:', error);
     }
   }, [error]);
 

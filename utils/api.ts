@@ -36,38 +36,16 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
             returnUrl
         );
         
-        console.log('인증 결과:', result);
-
-        // result.type이 dismiss여도 계속 진행
         if (result.type === "success" || (Platform.OS === 'android' && result.type === "dismiss")) {
             const resultWithUrl = result as WebBrowserResultWithUrl;
-            console.log("resultWithUrl:", resultWithUrl);
             const token = resultWithUrl.url ? extractTokenFromUrl(resultWithUrl.url) : null;
             if (token) {
-                console.log("토큰 추출 성공:", token);
                 await login(token);
-                Alert.alert("로그인 성공", "로그인이 완료되었습니다.");
                 router.push("/(app)/(tabs)");
-            } else {
-                console.error("URL에 토큰이 포함되지 않았습니다.");
-                Alert.alert("로그인 실패", "토큰을 가져오지 못했습니다.");
             }
-        } else {
-            if (Constants.expoConfig?.extra?.ENV === 'preview') {
-                Alert.alert(
-                    '디버그 정보', 
-                    `인증 타입: ${result.type}`,
-                    [{ text: '확인' }],
-                    { cancelable: true }
-                );
-            }
-            console.error("WebBrowser 세션 종료 실패");
-            Alert.alert("로그인 실패", "인증 과정에서 문제가 발생했습니다.");
         }
-        console.log("result = ", result);
     } catch (error) {
         console.error("Auth Error:", error);
-        Alert.alert("로그인 실패", "문제가 발생했습니다. 다시 시도해주세요.");
     }
 };
 

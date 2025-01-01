@@ -52,6 +52,7 @@ export default function HomeScreen() {
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const [selectedItemId, setSelectedItemId] = useState<string>('');
     const [adultActionInput, setAdultActionInput] = useState<string>('');
+    const [selectedChildAction, setSelectedChildAction] = useState<ChildActionItem | null>(null);
 
     // 날짜 포맷 함수 예시
     function formatDate(date: Date): string {
@@ -106,7 +107,7 @@ export default function HomeScreen() {
 
     useEffect(() => {
         if (dateError) {
-            Alert.alert('오류', '해당 날짜의 감사 목록을 불러오는 중 오류가 발생했습니다.');
+            console.error('데이터 로딩 오류:', dateError);
         }
     }, [dateError]);
 
@@ -166,13 +167,14 @@ export default function HomeScreen() {
             try {
                 await execute({ childActionContent: childActionContent });
             } catch (err) {
-                Alert.alert('오류', '감사 내용을 전송하는 중 문제가 발생했습니다.');
+                console.error('감사 내용 전송 오류:', err);
             }
         }
     };
 
     const handleLongPressItem = (item: ChildActionItem) => {
         setSelectedItemId(item.id);
+        setSelectedChildAction(item);
         setModalVisible(true);
     };
 
@@ -181,21 +183,27 @@ export default function HomeScreen() {
             const childActionIdNum = parseInt(selectedItemId, 10);
 
             if (isNaN(childActionIdNum)) {
-                Alert.alert('오류', '선택된 아동 행동 ID가 유효하지 않습니다.');
+                console.error('유효하지 않은 아동 행동 ID');
                 return;
             }
 
             try {
-                // 백엔드에 adultActionContent 및 childActionId 데이터 전송
                 await adultExecute({
                     adultActionContent: adultActionInput,
                     childActionId: childActionIdNum
                 });
+                
+                // 로컬 상태 업데이트
+                if (selectedChildAction) {
+                    setSelectedChildAction({
+                        ...selectedChildAction,
+                        adultActions: [...selectedChildAction.adultActions, adultActionInput]
+                    });
+                }
+                setAdultActionInput(''); // 입력 필드 초기화
             } catch (err) {
-                Alert.alert('오류', '칭찬 내용을 전송하는 중 문제가 발생했습니다.');
+                console.error('칭찬 내용 전송 오류:', err);
             }
-        } else {
-            Alert.alert('오류', '칭찬 내용과 아동 행동을 선택해주세요.');
         }
     };
 
@@ -326,6 +334,28 @@ export default function HomeScreen() {
                     <View style={styles.modalBackground}>
                         <View style={styles.modalContainer}>
                             <Text style={[styles.modalTitle, CommonStyles.heading2]}>내가 칭찬해줄게</Text>
+                            
+                            <View style={styles.selectedActionContainer}>
+                                <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
+                                <Text style={styles.selectedActionContent}>
+                                    {selectedChildAction?.childActionContent}
+                                </Text>
+                            </View>
+
+                            {selectedChildAction?.adultActions && selectedChildAction.adultActions.length > 0 && (
+                                <View style={styles.existingActionsContainer}>
+                                    <Text style={styles.existingActionsLabel}>칭찬 해줄게</Text>
+                                    <Text style={styles.existingActionContent}>
+                                        {selectedChildAction.adultActions.map((action, index) => (
+                                            <Text key={index}>
+                                                {action}
+                                                {index < selectedChildAction.adultActions.length - 1 ? ' • ' : ''}
+                                            </Text>
+                                        ))}
+                                    </Text>
+                                </View>
+                            )}
+
                             <View style={styles.adultActionInputContainer}>
                                 <TextInput
                                     style={styles.adultActionTextInput}
@@ -334,16 +364,20 @@ export default function HomeScreen() {
                                     onChangeText={setAdultActionInput}
                                     multiline
                                     textAlignVertical="top"
-                                    scrollEnabled={true}
-                                    editable={true}
-                                    keyboardType="default"
                                 />
-                                <TouchableOpacity onPress={addAdultAction}>
+                                <TouchableOpacity 
+                                    style={styles.addButton} 
+                                    onPress={addAdultAction}
+                                >
                                     <AntDesign name="pluscircleo" size={30} color="black" />
                                 </TouchableOpacity>
                             </View>
-                            <TouchableOpacity style={styles.button} onPress={completePraise}>
-                                <Text style={[styles.buttonText, CommonStyles.button]}>칭찬 완료</Text>
+                            
+                            <TouchableOpacity 
+                                style={styles.completeButton} 
+                                onPress={() => setModalVisible(false)}
+                            >
+                                <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -365,16 +399,16 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     topPadding: {
-        height: '3%',
+        height: SCREEN_HEIGHT * 0.03,
     },
     speechBubbleContainer: {
-        height: '25%',
+        height: SCREEN_HEIGHT * 0.25,
         justifyContent: 'center',
         zIndex: 2,
     },
     avatarContainer: {
-        height: '35%',
-        width: '60%',
+        height: SCREEN_HEIGHT * 0.35,
+        width: SCREEN_WIDTH * 0.6,
         alignSelf: 'center',
         zIndex: 1,
     },
@@ -384,7 +418,7 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
     spacer: {
-        height: '37%',
+        height: SCREEN_HEIGHT * 0.37,
     },
     childActionListScreen: {
         position: 'absolute',
@@ -428,7 +462,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 15,
         padding: 20,
-        width: '80%',
+        width: '90%',
+        maxHeight: '80%',
         alignItems: 'center',
     },
     modalTitle: {
@@ -437,29 +472,31 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.medium,
     },
     adultActionInputContainer: {
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        width: '100%',
+        marginBottom: 15,
+        gap: 10,
     },
     adultActionTextInput: {
         flex: 1,
         minHeight: 40,
         maxHeight: 80,
-        borderColor: '#ccc',
+        borderColor: '#ddd',
         borderWidth: 1,
         borderRadius: 8,
-        paddingHorizontal: 10,
+        padding: 10,
         backgroundColor: '#fff',
-        textAlignVertical: 'top',
-        marginRight: 10,
         fontFamily: FontFamily.regular,
     },
-    button: {
+    addButton: {
+        padding: 5,
+    },
+    completeButton: {
         backgroundColor: '#000',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
         borderRadius: 8,
-        marginTop: 5,
         alignSelf: 'center',
     },
     buttonText: {
@@ -470,5 +507,42 @@ const styles = StyleSheet.create({
     emphasizedText: {
         color: '#FF69B4',
         fontFamily: FontFamily.bold,
+    },
+    selectedActionContainer: {
+        width: '100%',
+        marginBottom: 15,
+        padding: 10,
+        backgroundColor: '#f5f5f5',
+        borderRadius: 8,
+    },
+    selectedActionLabel: {
+        fontSize: 14,
+        color: '#666',
+        marginBottom: 5,
+        fontFamily: FontFamily.medium,
+    },
+    selectedActionContent: {
+        fontSize: 16,
+        color: '#000',
+        fontFamily: FontFamily.regular,
+    },
+    existingActionsContainer: {
+        width: '100%',
+        marginBottom: 15,
+        padding: 15,
+        backgroundColor: '#FFF0F5',
+        borderRadius: 8,
+    },
+    existingActionsLabel: {
+        fontSize: 14,
+        color: '#666',
+        marginBottom: 8,
+        fontFamily: FontFamily.medium,
+    },
+    existingActionContent: {
+        fontSize: 14,
+        color: '#333',
+        lineHeight: 20,
+        fontFamily: FontFamily.regular,
     },
 });
