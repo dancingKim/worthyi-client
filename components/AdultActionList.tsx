@@ -9,7 +9,6 @@ interface AdultActionListProps {
     actions: ActionResponse[];
     childActionId: number;
     isFlatListScrollable: boolean;
-    onLongPressItem: (item: ActionResponse) => void;
     onDeleteItem: (id: number) => void;
     contentContainerStyle?: StyleProp<ViewStyle>;
     nestedScrollEnabled?: boolean;
@@ -19,26 +18,20 @@ const AdultActionList: React.FC<AdultActionListProps> = ({
     actions,
     childActionId,
     isFlatListScrollable,
-    onLongPressItem,
     onDeleteItem,
     contentContainerStyle,
     nestedScrollEnabled
 }) => {
     const renderItem = ({ item }: { item: ActionResponse }) => (
         <SwipeableItem onDelete={() => onDeleteItem(item.id)}>
-            <TouchableOpacity 
-                onLongPress={() => onLongPressItem(item)}
-                delayLongPress={200}
-            >
-                <View style={styles.itemContainer}>
-                    <Text style={styles.itemText}>{item.content.text}</Text>
-                    {item.responses && item.responses.length > 0 && (
-                        <View style={styles.checkContainer}>
-                            <AntDesign name="checkcircle" size={16} color="#FF69B4" />
-                        </View>
-                    )}
-                </View>
-            </TouchableOpacity>
+            <View style={styles.itemContainer}>
+                <Text style={styles.itemText}>{item.content.text}</Text>
+                {item.responses && item.responses.length > 0 && (
+                    <View style={styles.checkContainer}>
+                        <AntDesign name="checkcircle" size={16} color="#FF69B4" />
+                    </View>
+                )}
+            </View>
         </SwipeableItem>
     );
 

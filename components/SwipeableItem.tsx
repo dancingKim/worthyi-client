@@ -54,6 +54,8 @@ const SwipeableItem: React.FC<SwipeableItemProps> = ({ children, onDelete }) => 
             <PanGestureHandler
                 onGestureEvent={onGestureEvent}
                 onHandlerStateChange={onHandlerStateChange}
+                activeOffsetX={[-10, 10]}
+                failOffsetY={[-20, 20]}
             >
                 <Animated.View style={[
                     styles.content,
