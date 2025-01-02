@@ -281,8 +281,13 @@ export const HomeScreen: React.FC = () => {
                 childActionList={childActionList}
                 isFlatListScrollable={isFlatListScrollable}
                 onLongPressItem={handleLongPressItem}
-                onDeleteItem={(childId) => {
-                  console.log('delete child', childId);
+                onDeleteItem={async (childId) => {
+                  try {
+                    await executeDeleteChildAction(null, `${BASE_URL}/action/child/${childId}`);
+                    setChildActionList(prev => prev.filter(item => item.id !== childId));
+                  } catch (error) {
+                    console.error('Child action delete failed:', error);
+                  }
                 }}
                 contentContainerStyle={{ paddingBottom: 120 }}
               />
