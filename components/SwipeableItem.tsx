@@ -1,3 +1,4 @@
+// src/components/SwipeableItem.tsx
 import React, { FC, ReactNode } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import {
@@ -8,32 +9,33 @@ import {
 } from 'react-native-gesture-handler';
 import { FontFamily } from '@/constants/Fonts';
 
+/** props 타입 정의 */
 interface SwipeableItemProps {
+  /** 아이템 내부에 표시할 Children (예: 텍스트, 버튼 등) */
   children: ReactNode;
+  /** 스와이프 후 삭제 버튼을 눌렀을 때 실행할 함수 */
   onDelete: () => void;
 }
 
-const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
+export const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
   const translateX = new Animated.Value(0);
   const deleteButtonWidth = 80;
 
-  // 수평 드래그
+  /** 수평 드래그 이벤트 */
   const onGestureEvent = Animated.event([{ nativeEvent: { translationX: translateX } }], {
     useNativeDriver: true,
   });
 
-  // 제스처 상태
+  /** 제스처 상태 변경: 드래그 끝난 후 위치에 따라 삭제 버튼 노출/원위치 */
   const onHandlerStateChange = (event: HandlerStateChangeEvent<PanGestureHandlerEventPayload>) => {
     if (event.nativeEvent.state === State.END) {
       const { translationX } = event.nativeEvent;
       if (translationX < -deleteButtonWidth / 2) {
-        // 왼쪽으로 스와이프
         Animated.spring(translateX, {
           toValue: -deleteButtonWidth,
           useNativeDriver: true,
         }).start();
       } else {
-        // 원위치
         Animated.spring(translateX, {
           toValue: 0,
           useNativeDriver: true,
@@ -44,16 +46,19 @@ const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
 
   return (
     <View style={styles.container}>
-      {/* 삭제 버튼 */}
-      <TouchableOpacity style={[styles.deleteButton, { width: deleteButtonWidth }]} onPress={onDelete}>
+      {/* 삭제 버튼 (스와이프로 왼쪽이 열렸을 때 보이게 됨) */}
+      <TouchableOpacity
+        style={[styles.deleteButton, { width: deleteButtonWidth }]}
+        onPress={onDelete}
+      >
         <Text style={styles.deleteButtonText}>삭제</Text>
       </TouchableOpacity>
 
       <PanGestureHandler
         onGestureEvent={onGestureEvent}
         onHandlerStateChange={onHandlerStateChange}
-        activeOffsetX={[-10, 10]}
-        failOffsetY={[-20, 20]}
+        activeOffsetX={[-5, 5]}   // 가로 스와이프 감도
+        failOffsetY={[-50, 50]}  // 수직으로 살짝 움직여도 실패 처리되지 않도록
       >
         <Animated.View
           style={[
@@ -79,7 +84,9 @@ const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { position: 'relative' },
+  container: {
+    position: 'relative',
+  },
   content: {
     backgroundColor: '#fff',
   },
@@ -99,5 +106,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
-export default SwipeableItem;

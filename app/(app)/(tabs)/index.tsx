@@ -1,3 +1,4 @@
+// src/screens/HomeScreen.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
@@ -14,22 +15,17 @@ import {
   PanResponder,
   Dimensions,
   Modal,
-  Alert,
   FlatList,
   GestureResponderEvent,
   PanResponderGestureState,
 } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  withTiming,
-  useSharedValue,
-} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-native-reanimated';
 import { AntDesign } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 
-import ChildActionList from '@/components/ChildActionList';
-import AdultActionList from '@/components/AdultActionList';
+import { ChildActionList } from '@/components/ChildActionList';
+import { AdultActionList } from '@/components/AdultActionList';
 import SpeechBubble from '@/components/SpeechBubble';
 
 import {
@@ -37,10 +33,7 @@ import {
   ActionResponse,
   ActionContent,
   AddAdultActionRequest,
-  DeleteResponse,
 } from '@/types/types';
-
-// API Hooks (예시)
 import { useApiGeneric } from '@/hooks/api/useApiGeneric';
 import { useChildActionApi } from '@/hooks/api/useChildActionApi';
 import { useAdultActionApi } from '@/hooks/api/useAdultActionApi';
@@ -69,10 +62,8 @@ const LAYOUT_HEIGHTS = {
       })
 };
 
-export default function HomeScreen() {
+export const HomeScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
-
-  // State
   const [childActionContent, setChildActionContent] = useState('');
   const [childActionList, setChildActionList] = useState<ActionResponse[]>([]);
   const [isFlatListScrollable, setIsFlatListScrollable] = useState(true);
@@ -83,66 +74,63 @@ export default function HomeScreen() {
   const [selectedChildAction, setSelectedChildAction] = useState<ActionResponse | null>(null);
 
   const currentPosition = useSharedValue(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
-
-  // ENV
-  const BASE_URL = Constants.expoConfig?.extra?.BASE_URL || '';
-  console.log('BASE_URL =>', BASE_URL);
+  const BASE_URL = Constants.expoConfig?.extra?.BASE_URL ?? '';
 
   // API Hooks
   const { executeAddChildAction, executeDeleteChildAction } = useChildActionApi();
   const { executeAddAdultAction, executeDeleteAdultAction } = useAdultActionApi();
 
-  // 예: 날짜 포맷
-  function formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  // 날짜 형식
+  function formatDate(date: Date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
   const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date()));
 
-  // 그냥 POST child action 예시
-  const { data, execute } = useApiGeneric<{ content: ActionContent }, ApiResponse<ActionResponse>>({
-    condition: true,
-    method: 'POST',
-    url: `${BASE_URL}/action/child`,
-  });
-
-  // adult
-  const { data: adultData, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<ActionResponse>>({
-    condition: true,
-    method: 'POST',
-    url: `${BASE_URL}/action/{childActionId}/adult`,
-  });
-
-  // GET date
+  // 예: GET /action?date=xxxx
   const { data: dateData, execute: dateExecute } = useApiGeneric<null, ApiResponse<ActionResponse[]>>({
     condition: true,
     method: 'GET',
     url: `${BASE_URL}/action?date=${selectedDate}`,
   });
 
+  // POST child
+  const { data, execute: childExecute } = useApiGeneric<{ content: ActionContent }, ApiResponse<ActionResponse>>({
+    condition: true,
+    method: 'POST',
+    url: `${BASE_URL}/action/child`,
+  });
+
+  // POST adult
+  const { data: adultData, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<ActionResponse>>({
+    condition: true,
+    method: 'POST',
+    url: `${BASE_URL}/action/{childActionId}/adult`,
+  });
+
+  // 날짜 바뀔 때마다 GET
   useEffect(() => {
-    // 날짜 바뀔 때마다 fetch
     (async () => {
       await dateExecute();
     })();
   }, [selectedDate]);
 
+  // dateData -> 리스트
   useEffect(() => {
     if (dateData?.data) {
       setChildActionList(dateData.data);
     }
   }, [dateData]);
 
-  // PanResponder (상위)
+  // PanResponder: 안드로이드 충돌 방지
   const panResponder = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+      onMoveShouldSetPanResponder: (_evt: GestureResponderEvent, gestureState: PanResponderGestureState) => {
         const dx = Math.abs(gestureState.dx);
         const dy = Math.abs(gestureState.dy);
-
-        // *** 핵심: "엄격한 수직" 조건 => dy > dx && dy > 10
+        // 수직 드래그가 훨씬 크고 10px 이상
         if (dy > dx && dy > 10) {
           return true;
         }
@@ -151,11 +139,11 @@ export default function HomeScreen() {
       onPanResponderGrant: () => {
         setIsFlatListScrollable(false);
       },
-      onPanResponderMove: (evt, gestureState) => {
+      onPanResponderMove: (_evt, gestureState) => {
         const newPos = currentPosition.value + gestureState.dy;
         currentPosition.value = Math.max(0, Math.min(SCREEN_HEIGHT, newPos));
       },
-      onPanResponderRelease: (evt, gestureState) => {
+      onPanResponderRelease: (_evt, gestureState) => {
         setIsFlatListScrollable(true);
         if (gestureState.dy < -50) {
           currentPosition.value = withTiming(0);
@@ -170,29 +158,30 @@ export default function HomeScreen() {
     })
   ).current;
 
-  // Child
+  // Child 추가
   const addChildAction = async () => {
     if (!childActionContent.trim()) return;
     try {
-      await execute({ content: { text: childActionContent, imageUrl: null } });
-    } catch (err) {
-      console.error('addChildAction error:', err);
+      await childExecute({ content: { text: childActionContent, imageUrl: null } });
+    } catch (error) {
+      console.error('addChildAction error:', error);
     }
   };
 
+  // Child 액션 성공 시 추가
   useEffect(() => {
     if (data?.data) {
       const newChild = data.data;
-      setChildActionList(prev => [newChild, ...prev]);
+      setChildActionList((prev) => [newChild, ...prev]);
       setChildActionContent('');
     }
   }, [data]);
 
-  // Adult
+  // Adult 추가
   const addAdultAction = async () => {
     if (!adultActionInput.trim() || !selectedChildAction) return;
     try {
-      const resp = await executeAddAdultAction(
+      const resp = await adultExecute(
         {
           content: { text: adultActionInput, imageUrl: null },
           actionId: selectedChildAction.id,
@@ -201,18 +190,11 @@ export default function HomeScreen() {
       );
       if (resp?.data) {
         const newAdult = resp.data;
-        // 모달 내 state 업데이트
-        setSelectedChildAction(prev =>
-          prev
-            ? {
-                ...prev,
-                responses: [...(prev.responses || []), newAdult],
-              }
-            : null
+        setSelectedChildAction((prev: ActionResponse | null) =>
+          prev ? { ...prev, responses: [...(prev.responses || []), newAdult] } : null
         );
-        // 전체 리스트 업데이트
-        setChildActionList(prevList =>
-          prevList.map(item =>
+        setChildActionList((prevList) =>
+          prevList.map((item) =>
             item.id === selectedChildAction.id
               ? { ...item, responses: [...(item.responses || []), newAdult] }
               : item
@@ -225,20 +207,21 @@ export default function HomeScreen() {
     }
   };
 
+  // adultData -> 이미 addAdultAction 안에서 처리
   useEffect(() => {
     if (adultData?.data) {
-      // 보통은 addAdultAction 안에 중복되므로 생략 가능
       setAdultActionInput('');
     }
   }, [adultData]);
 
-  // 모달
+  // 아이템 롱프레스 -> 모달
   const handleLongPressItem = (item: ActionResponse) => {
     setSelectedItemId(String(item.id));
     setSelectedChildAction(item);
     setModalVisible(true);
   };
 
+  // 모달 완료
   const completePraise = async () => {
     if (adultActionInput.trim()) {
       await addAdultAction();
@@ -248,16 +231,15 @@ export default function HomeScreen() {
     setSelectedItemId('');
   };
 
-  // 애니메이션
+  // 애니메이션 스타일
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: currentPosition.value }],
   }));
 
-  // 렌더
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* 메인 화면 */}
+        {/* 상단 영역 */}
         <View style={styles.mainScreen}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.mainContent}>
@@ -283,7 +265,7 @@ export default function HomeScreen() {
           </TouchableWithoutFeedback>
         </View>
 
-        {/* 하단 슬라이드 (ChildActionList) */}
+        {/* 하단 슬라이드: ChildActionList */}
         <Animated.View style={[styles.childActionListScreen, animatedStyle]}>
           <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
             <View style={styles.swipeBar} />
@@ -299,8 +281,8 @@ export default function HomeScreen() {
                 childActionList={childActionList}
                 isFlatListScrollable={isFlatListScrollable}
                 onLongPressItem={handleLongPressItem}
-                onDeleteItem={(id) => {
-                  // child delete...
+                onDeleteItem={(childId) => {
+                  console.log('delete child', childId);
                 }}
                 contentContainerStyle={{ paddingBottom: 120 }}
               />
@@ -309,14 +291,17 @@ export default function HomeScreen() {
         </Animated.View>
       </View>
 
-      {/* 칭찬 모달 */}
+      {/* 모달: AdultActionList */}
       <Modal
         visible={modalVisible}
         transparent={true}
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
       >
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+        >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
@@ -324,29 +309,31 @@ export default function HomeScreen() {
                   ListHeaderComponent={() => (
                     <>
                       <View style={styles.selectedActionContainer}>
-                        <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
+                        <Text style={styles.selectedActionLabel}>
+                          아이가 들려준 감사에요
+                        </Text>
                         <Text style={styles.selectedActionContent}>
                           {selectedChildAction?.content.text}
                         </Text>
                       </View>
 
-                      {selectedChildAction?.responses?.length ? (
+                      {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
                         <View style={styles.existingActionsContainer}>
                           <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
                           <AdultActionList
                             actions={selectedChildAction.responses}
                             childActionId={selectedChildAction.id}
                             onDeleteItem={(adultId) => {
-                              // adult delete...
+                              console.log('delete adult', adultId);
                             }}
                             isFlatListScrollable={true}
                             contentContainerStyle={{ paddingBottom: 100 }}
                           />
                         </View>
-                      ) : null}
+                      )}
                     </>
                   )}
-                  data={[]}
+                  data={[]} // 실 데이터를 FlatList로 표시할게 없으면 빈 배열
                   renderItem={null}
                   style={{ flex: 1 }}
                   contentContainerStyle={{ padding: 20, paddingBottom: 180 }}
@@ -379,7 +366,7 @@ export default function HomeScreen() {
       </Modal>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
