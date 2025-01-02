@@ -12,7 +12,6 @@ import {
     Keyboard,
     KeyboardAvoidingView,
     TouchableWithoutFeedback,
-    Animated,
     PanResponder,
     Dimensions,
     Modal,
@@ -37,6 +36,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
 import AdultActionList from '@/components/AdultActionList';
+import Animated, { useAnimatedStyle, withTiming, useSharedValue, runOnJS } from 'react-native-reanimated';
+import { useChildActionApi } from '@/hooks/api/useChildActionApi';
+import { useAdultActionApi } from '@/hooks/api/useAdultActionApi';
 
 
 
@@ -65,7 +67,7 @@ const LAYOUT_HEIGHTS = {
 
 interface DateResponse extends ApiResponse<ActionResponse[]> {}
 
-export default function HomeScreen() {
+export function HomeScreen() {
     const insets = useSafeAreaInsets();
     const [childActionContent, setChildActionContent] = useState<string>('');
     const [childActionList, setChildActionList] = useState<ActionResponse[]>([]);
@@ -75,6 +77,9 @@ export default function HomeScreen() {
     const [selectedItemId, setSelectedItemId] = useState<string>('');
     const [adultActionInput, setAdultActionInput] = useState<string>('');
     const [selectedChildAction, setSelectedChildAction] = useState<ActionResponse | null>(null);
+
+    const { executeAddChildAction, executeDeleteChildAction } = useChildActionApi();
+    const { executeAddAdultAction, executeDeleteAdultAction } = useAdultActionApi();
 
     // 날짜 포맷 함수 예시
     function formatDate(date: Date): string {
@@ -86,8 +91,7 @@ export default function HomeScreen() {
 
     const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date())); // 예: 기본 날짜
 
-    const animatedValue = useRef(new Animated.Value(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION)).current;
-    const currentPosition = useRef(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
+    const currentPosition = useSharedValue(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
     const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
     const { data, isLoading, error, execute } = useApiGeneric<{ content: ActionContent }, ApiResponse<ActionResponse>>({
@@ -99,7 +103,7 @@ export default function HomeScreen() {
     const { data: adultData, isLoading: adultIsLoading, error: adultError, execute: adultExecute } = useApiGeneric<AddAdultActionRequest, ApiResponse<ActionResponse>>({
         condition: true,
         method: 'POST',
-        url: `${BASE_URL}/action/adult`
+        url: `${BASE_URL}/action/{childActionId}/adult`
     });
 
     const { data: dateData, isLoading: dateLoading, error: dateError, execute: dateExecute } = useApiGeneric<null, DateResponse>({
@@ -117,7 +121,7 @@ export default function HomeScreen() {
     const { execute: executeDeleteAdult } = useApiGeneric<null, DeleteResponse>({
         condition: true,
         method: 'DELETE',
-        url: `${BASE_URL}/action/adult`
+        url: `${BASE_URL}/action/{childActionId}/adult/{adultActionId}`
     });
 
     useEffect(() => {
@@ -139,15 +143,6 @@ export default function HomeScreen() {
         }
     }, [dateError]);
 
-    useEffect(() => {
-        const listenerId = animatedValue.addListener(({ value }) => {
-            currentPosition.current = value;
-        });
-        return () => {
-            animatedValue.removeListener(listenerId);
-        };
-    }, [animatedValue]);
-
     const panResponder = useRef(
         PanResponder.create({
             onMoveShouldSetPanResponderCapture: (_, gestureState) => false,
@@ -158,36 +153,25 @@ export default function HomeScreen() {
                 setIsFlatListScrollable(false);
             },
             onPanResponderMove: (_, gestureState) => {
-                const newValue = currentPosition.current + gestureState.dy;
-                if (newValue >= 0 && newValue <= SCREEN_HEIGHT) {
-                    animatedValue.setValue(newValue);
-                }
+                currentPosition.value = Math.max(0, Math.min(SCREEN_HEIGHT, currentPosition.value + gestureState.dy));
             },
             onPanResponderRelease: (_, gestureState) => {
                 setIsFlatListScrollable(true);
-                const finalPosition = currentPosition.current;
-
                 if (gestureState.dy < -50) {
-                    animateToPosition(0);
+                    currentPosition.value = withTiming(0);
                 } else if (gestureState.dy > 50) {
-                    animateToPosition(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
+                    currentPosition.value = withTiming(LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
                 } else {
-                    const destination =
-                        finalPosition < LAYOUT_HEIGHTS.INITIAL_LIST_POSITION / 2 ? 0 : LAYOUT_HEIGHTS.INITIAL_LIST_POSITION;
-                    animateToPosition(destination);
+                    currentPosition.value = withTiming(currentPosition.value < LAYOUT_HEIGHTS.INITIAL_LIST_POSITION / 2 
+                        ? 0 
+                        : LAYOUT_HEIGHTS.INITIAL_LIST_POSITION);
                 }
             },
         })
     ).current;
 
     const animateToPosition = (position: number) => {
-        Animated.timing(animatedValue, {
-            toValue: position,
-            duration: 300,
-            useNativeDriver: false,
-        }).start(() => {
-            currentPosition.current = position;
-        });
+        currentPosition.value = position;
     };
 
     const addChildAction = async () => {
@@ -212,40 +196,30 @@ export default function HomeScreen() {
     };
 
     const addAdultAction = async () => {
-        if (adultActionInput.trim() !== '' && selectedItemId.trim() !== '') {
-            const childActionIdNum = parseInt(selectedItemId, 10);
-
-            if (isNaN(childActionIdNum)) {
-                console.error('유효하지 않은 아동 행동 ID');
-                return;
-            }
-
+        if (adultActionInput.trim() !== '' && selectedChildAction) {
             try {
-                await adultExecute({
+                const response = await executeAddAdultAction({
                     content: {
                         text: adultActionInput,
                         imageUrl: null
-                    },
-                    actionId: childActionIdNum
-                });
+                    }
+                }, `${BASE_URL}/action/${selectedChildAction.id}/adult`);
                 
-                // 로컬 상태 업데이트
-                if (selectedChildAction) {
-                    setSelectedChildAction({
-                        ...selectedChildAction,
-                        responses: [
-                            ...(selectedChildAction.responses || []),
-                            {
-                                id: Date.now(), // 임시 ID
-                                content: { text: adultActionInput },
-                                responses: []
-                            }
-                        ]
-                    });
+                if (response?.data) {
+                    const newAdultAction = response.data;
+                    setSelectedChildAction(prev => prev ? {
+                        ...prev,
+                        responses: [...(prev.responses || []), newAdultAction]
+                    } : null);
+                    setChildActionList(prevList => prevList.map(item => 
+                        item.id === selectedChildAction.id 
+                            ? { ...item, responses: [...(item.responses || []), newAdultAction] }
+                            : item
+                    ));
                 }
                 setAdultActionInput('');
-            } catch (err) {
-                console.error('칭찬 내용 전송 오류:', err);
+            } catch (error) {
+                console.error('칭찬 내용 전송 오류:', error);
             }
         }
     };
@@ -297,7 +271,7 @@ export default function HomeScreen() {
 
     const handleDeleteChildAction = async (id: number) => {
         try {
-            await executeDeleteChild(null, `${BASE_URL}/action/child/${id}`);
+            await executeDeleteChildAction(null, `${BASE_URL}/action/child/${id}`);
             setChildActionList(prev => prev.filter(item => item.id !== id));
         } catch (error) {
             console.error('아동 행동 삭제 실패:', error);
@@ -305,15 +279,22 @@ export default function HomeScreen() {
         }
     };
 
-    const handleDeleteAdultAction = async (id: number) => {
+    const handleDeleteAdultAction = async (childActionId: number, adultActionId: number) => {
         try {
-            await executeDeleteAdult(null, `${BASE_URL}/action/adult/${id}`);
-            if (selectedChildAction) {
-                setSelectedChildAction({
-                    ...selectedChildAction,
-                    responses: selectedChildAction.responses?.filter(item => item.id !== id) || []
-                });
-            }
+            await executeDeleteAdultAction(null, `${BASE_URL}/action/${childActionId}/adult/${adultActionId}`);
+            setSelectedChildAction(prev => prev ? {
+                ...prev,
+                responses: prev.responses?.filter(item => item.id !== adultActionId) || []
+            } : null);
+            
+            setChildActionList(prevList => prevList.map(item => 
+                item.id === childActionId
+                    ? {
+                        ...item,
+                        responses: item.responses?.filter(response => response.id !== adultActionId) || []
+                    }
+                    : item
+            ));
         } catch (error) {
             console.error('어른 행동 삭제 실패:', error);
             Alert.alert('삭제 실패', '다시 시도해주세요.');
@@ -323,6 +304,12 @@ export default function HomeScreen() {
     // 화면 크기에 따른 동적 패딩 계산
     const screenHeight = Dimensions.get('window').height;
     const bottomPadding = insets.bottom + (screenHeight * 0.3); // 화면 높이의 12% 정도를 패딩으로 설정
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{
+            translateY: currentPosition.value
+        }]
+    }));
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -354,15 +341,7 @@ export default function HomeScreen() {
                     </View>
 
                     <Animated.View
-                        style={[styles.childActionListScreen, {
-                            transform: [{
-                                translateY: animatedValue.interpolate({
-                                    inputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
-                                    outputRange: [0, LAYOUT_HEIGHTS.INITIAL_LIST_POSITION],
-                                    extrapolate: 'clamp',
-                                }),
-                            }],
-                        }]}
+                        style={[styles.childActionListScreen, animatedStyle]}
                     >
                         <View style={styles.swipeBarContainer} {...panResponder.panHandlers}>
                             <View style={styles.swipeBar} />
@@ -391,38 +370,48 @@ export default function HomeScreen() {
                     animationType="slide"
                     onRequestClose={() => setModalVisible(false)}
                 >
-                    <KeyboardAvoidingView 
+                    <KeyboardAvoidingView
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                        style={styles.modalBackground}
+                        style={{ flex: 1 }}
                     >
                         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                            <View style={styles.modalContent}>
-                                <View style={styles.modalContainer}>
-                                    <ScrollView 
-                                        style={styles.modalScrollView}
-                                        keyboardShouldPersistTaps="handled"
-                                    >
-                                        <Text style={[styles.modalTitle, CommonStyles.heading2]}>
-                                            내가 칭찬해줄게
-                                        </Text>
-                                        
-                                        <View style={styles.selectedActionContainer}>
-                                            <Text style={styles.selectedActionLabel}>아이가 들려준 감사에요</Text>
-                                            <Text style={styles.selectedActionContent}>
-                                                {selectedChildAction?.content.text}
-                                            </Text>
-                                        </View>
+                            <View style={styles.modalContainer}>
+                                <View style={styles.modalContent}>
+                                    <FlatList
+                                        ListHeaderComponent={() => (
+                                            <>
+                                                <View style={styles.selectedActionContainer}>
+                                                    <Text style={styles.selectedActionLabel}>
+                                                        아이가 들려준 감사에요
+                                                    </Text>
+                                                    <Text style={styles.selectedActionContent}>
+                                                        {selectedChildAction?.content.text}
+                                                    </Text>
+                                                </View>
 
-                                        {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
-                                            <View style={styles.existingActionsContainer}>
-                                                <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
-                                                <AdultActionList
-                                                    actions={selectedChildAction.responses}
-                                                    onDeleteAction={handleDeleteAdultAction}
-                                                />
-                                            </View>
+                                                {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
+                                                    <View style={styles.existingActionsContainer}>
+                                                        <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
+                                                        <AdultActionList
+                                                            actions={selectedChildAction.responses}
+                                                            childActionId={selectedChildAction.id}
+                                                            onDeleteItem={(adultActionId) => 
+                                                                handleDeleteAdultAction(selectedChildAction.id, adultActionId)
+                                                            }
+                                                            isFlatListScrollable={true}
+                                                            onLongPressItem={() => {}}
+                                                            contentContainerStyle={{ paddingBottom: 150 }}
+                                                        />
+                                                    </View>
+                                                )}
+                                            </>
                                         )}
-                                    </ScrollView>
+                                        data={[]}
+                                        renderItem={() => null}
+                                        style={{ flex: 1 }}
+                                        contentContainerStyle={{ padding: 20, paddingBottom: 200 }}
+                                        showsVerticalScrollIndicator={false}
+                                    />
 
                                     <View style={styles.modalBottomContainer}>
                                         <View style={styles.adultActionInputContainer}>
@@ -534,18 +523,21 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    modalContent: {
+    modalContainer: {
         width: '100%',
         height: '100%',
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
     },
-    modalContainer: {
+    modalContent: {
         backgroundColor: '#fff',
         borderRadius: 15,
         width: '90%',
-        maxHeight: '80%',
+        height: '70%',
         paddingTop: 20,
+        overflow: 'hidden',
+        position: 'relative',
     },
     modalScrollView: {
         maxHeight: '80%',
@@ -558,6 +550,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         borderBottomLeftRadius: 15,
         borderBottomRightRadius: 15,
+        width: '100%',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 3,
     },
     modalTitle: {
         fontSize: 18,
@@ -625,6 +628,7 @@ const styles = StyleSheet.create({
         padding: 15,
         backgroundColor: '#FFF0F5',
         borderRadius: 8,
+        flex: 1,
     },
     existingActionsLabel: {
         fontSize: 14,
@@ -636,3 +640,5 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 });
+
+export default HomeScreen;

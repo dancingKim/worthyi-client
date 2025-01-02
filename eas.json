@@ -21,6 +21,12 @@
       "distribution": "internal",
       "env": {
         "NODE_ENV": "preview"
+      },
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "preview_simulator" : {
@@ -34,6 +40,13 @@
       "autoIncrement": true,
       "env": {
         "NODE_ENV": "production"
+      },
+      "distribution": "store",
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "app-bundle"
       }
     }
   }

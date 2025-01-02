@@ -52,8 +52,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const login = async (token: string) => {
         try {
+            console.log('Saving token:', token);
             await saveToken(token);
             const userResponse = await fetchUserMe();
+            console.log('User response after login:', userResponse);
+            
             if (userResponse?.data) {
                 setUser(userResponse.data);
                 setIsLoggedIn(true);

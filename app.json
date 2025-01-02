@@ -11,7 +11,9 @@
     "splash": {
       "image": "./assets/images/Worthy-I-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "imageResizeMode": "contain",
+      "imageSize": "70%"
     },
     "jsEngine": "hermes",
     "ios": {
@@ -32,7 +34,8 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/Worthy-I-logo.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "monochromeImage": "./assets/images/Worthy-I-logo.png"
       },
       "package": "com.worthyi.worthyi"
     },

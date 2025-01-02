@@ -1,66 +1,45 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { FlatList, TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle, ScrollView } from 'react-native';
 import { ActionResponse } from '@/types/types';
 import { FontFamily } from '@/constants/Fonts';
-import Animated, { 
-    useAnimatedStyle,
-    withSpring,
-    useSharedValue,
-    runOnJS
-} from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
+import SwipeableItem from './SwipeableItem';
 
 interface AdultActionListProps {
     actions: ActionResponse[];
-    onDeleteAction: (id: number) => void;
+    childActionId: number;
+    isFlatListScrollable: boolean;
+    onLongPressItem: (item: ActionResponse) => void;
+    onDeleteItem: (id: number) => void;
+    contentContainerStyle?: StyleProp<ViewStyle>;
+    nestedScrollEnabled?: boolean;
 }
 
-interface SwipeableItemProps {
-    item: ActionResponse;
-    onDelete: (id: number) => void;
-}
-
-const SwipeableItem: React.FC<SwipeableItemProps> = ({ item, onDelete }) => {
-    const translateX = useSharedValue(0);
-
-    const gesture = Gesture.Pan()
-        .onChange((event) => {
-            translateX.value = Math.min(0, event.translationX);
-        })
-        .onEnd(() => {
-            const shouldBeDismissed = translateX.value < -100;
-            if (shouldBeDismissed) {
-                runOnJS(onDelete)(item.id);
-            } else {
-                translateX.value = withSpring(0);
-            }
-        });
-
-    const rStyle = useAnimatedStyle(() => ({
-        transform: [{ translateX: translateX.value }],
-    }));
-
-    return (
-        <GestureDetector gesture={gesture}>
-            <Animated.View style={rStyle}>
+const AdultActionList: React.FC<AdultActionListProps> = ({
+    actions,
+    childActionId,
+    isFlatListScrollable,
+    onLongPressItem,
+    onDeleteItem,
+    contentContainerStyle,
+    nestedScrollEnabled
+}) => {
+    const renderItem = ({ item }: { item: ActionResponse }) => (
+        <SwipeableItem onDelete={() => onDeleteItem(item.id)}>
+            <TouchableOpacity 
+                onLongPress={() => onLongPressItem(item)}
+                delayLongPress={200}
+            >
                 <View style={styles.itemContainer}>
                     <Text style={styles.itemText}>{item.content.text}</Text>
-                    <View style={styles.iconContainer}>
-                        <AntDesign name="heart" size={16} color="#FF69B4" />
-                    </View>
+                    {item.responses && item.responses.length > 0 && (
+                        <View style={styles.checkContainer}>
+                            <AntDesign name="checkcircle" size={16} color="#FF69B4" />
+                        </View>
+                    )}
                 </View>
-            </Animated.View>
-        </GestureDetector>
-    );
-};
-
-const AdultActionList: React.FC<AdultActionListProps> = ({ actions, onDeleteAction }) => {
-    const renderItem = ({ item }: { item: ActionResponse }) => (
-        <SwipeableItem
-            item={item}
-            onDelete={onDeleteAction}
-        />
+            </TouchableOpacity>
+        </SwipeableItem>
     );
 
     return (
@@ -68,8 +47,9 @@ const AdultActionList: React.FC<AdultActionListProps> = ({ actions, onDeleteActi
             data={actions}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()}
-            scrollEnabled={false}
-            contentContainerStyle={styles.listContainer}
+            scrollEnabled={isFlatListScrollable}
+            contentContainerStyle={contentContainerStyle}
+            nestedScrollEnabled={nestedScrollEnabled}
         />
     );
 };
@@ -103,7 +83,11 @@ const styles = StyleSheet.create({
     iconContainer: {
         marginLeft: 8,
         padding: 4,
-    }
+    },
+    checkContainer: {
+        marginLeft: 8,
+        padding: 4,
+    },
 });
 
 export default AdultActionList; 

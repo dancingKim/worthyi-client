@@ -38,6 +38,7 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
         
         if (result.type === "success" || (Platform.OS === 'android' && result.type === "dismiss")) {
             const resultWithUrl = result as WebBrowserResultWithUrl;
+            console.log("resultWithUrl:", resultWithUrl);
             const token = resultWithUrl.url ? extractTokenFromUrl(resultWithUrl.url) : null;
             if (token) {
                 await login(token);

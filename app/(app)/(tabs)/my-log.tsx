@@ -5,7 +5,7 @@ import { useApiGeneric } from '@/hooks/api/useApiGeneric';
 import Constants from 'expo-constants';
 import CalendarWithGratitude from '@/components/CalendarWithGratitude';
 import { ApiResponse, ActionLogResponse, ActionResponse } from '@/types/types';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
@@ -27,15 +27,15 @@ export default function MyLogScreen() {
   const dateStr = formatDate(selectedDate);
 
   // API 훅
-  const { data, isLoading, error, execute } = useApiGeneric<null, ApiResponse<ActionLogResponse>>({
+  const { data: actionData, error, isLoading, execute: executeGetActions } = useApiGeneric<null, ApiResponse<ActionLogResponse>>({
     condition: true,
     method: 'GET',
-    url: `${BASE_URL}/action/logs?date=${dateStr}`
+    url: `${BASE_URL}/action/logs?date=${formatDate(selectedDate)}`
   });
 
   useEffect(() => {
-    execute();
-  }, [dateStr]);
+    executeGetActions();
+  }, [selectedDate]);
 
   useEffect(() => {
     if (error) {
@@ -44,15 +44,30 @@ export default function MyLogScreen() {
     }
   }, [error]);
 
+  useEffect(() => {
+    if (actionData?.data) {
+      console.log('Daily Logs:', JSON.stringify(actionData.data.dailyLogs, null, 2));
+      // 데이터 구조 확인
+      actionData.data.dailyLogs.forEach((log, index) => {
+        console.log(`Log ${index}:`, {
+          date: log.date,
+          actionsCount: log.actions?.length
+        });
+      });
+    }
+  }, [actionData]);
+
   // 데이터를 가져오지 못했거나 에러가 발생한 경우 기본값 사용
-  const dailyLogs = data?.data?.dailyLogs || [];
-  const weeklyCount = data?.data?.weeklyCount || 0;
-  const monthlyCount = data?.data?.monthlyCount || 0;
-  const yearlyCount = data?.data?.yearlyCount || 0;
+  const dailyLogs = actionData?.data?.dailyLogs || [];
+  const weeklyCount = actionData?.data?.weeklyCount || 0;
+  const monthlyCount = actionData?.data?.monthlyCount || 0;
+  const yearlyCount = actionData?.data?.yearlyCount || 0;
 
   // 감사한 날짜 목록: 데이터가 없으면 빈 배열
   const gratitudeDates = dailyLogs?.map(log => log.date) || [];
-  const actions = dailyLogs?.[0]?.actions || [] as ActionResponse[];
+  const actions = dailyLogs?.reduce((acc, log) => {
+    return [...acc, ...(log.actions || [])];
+  }, [] as ActionResponse[]) || [];
   
   // 화면 크기에 따른 동적 패딩 계산
   const screenHeight = Dimensions.get('window').height;
@@ -77,22 +92,20 @@ export default function MyLogScreen() {
         {isLoading && <ActivityIndicator size="large" />}
 
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
+          <View style={styles.statItem}>
             <Ionicons name="calendar-outline" size={24} color="#4A90E2" />
-            <Text style={[styles.statLabel, CommonStyles.caption]}>이번 주</Text>
-            <Text style={[styles.statValue, { fontFamily: FontFamily.bold }]}>{weeklyCount}일</Text>
+            <Text style={styles.statValue}>{weeklyCount}</Text>
+            <Text style={styles.statLabel}>이번 주</Text>
           </View>
-          
-          <View style={styles.statCard}>
+          <View style={styles.statItem}>
             <Ionicons name="moon-outline" size={24} color="#50C878" />
-            <Text style={[styles.statLabel, CommonStyles.caption]}>이번 달</Text>
-            <Text style={[styles.statValue, { fontFamily: FontFamily.bold }]}>{monthlyCount}일</Text>
+            <Text style={styles.statValue}>{monthlyCount}</Text>
+            <Text style={styles.statLabel}>이번 달</Text>
           </View>
-          
-          <View style={styles.statCard}>
+          <View style={styles.statItem}>
             <Ionicons name="star-outline" size={24} color="#FFB347" />
-            <Text style={[styles.statLabel, CommonStyles.caption]}>올해</Text>
-            <Text style={[styles.statValue, { fontFamily: FontFamily.bold }]}>{yearlyCount}일</Text>
+            <Text style={styles.statValue}>{yearlyCount}</Text>
+            <Text style={styles.statLabel}>올해</Text>
           </View>
         </View>
 
@@ -140,45 +153,68 @@ export default function MyLogScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   scrollView: {
     flex: 1,
+    paddingHorizontal: 20,
   },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  title: {
+    fontSize: 28,
+    fontFamily: FontFamily.bold,
+    marginVertical: 24,
+    color: '#333',
+    textAlign: 'center',
+  },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 20,
-    paddingHorizontal: 10,
-  },
-  statCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    alignItems: 'center',
-    width: Dimensions.get('window').width / 3.5,
+    padding: 24,
+    backgroundColor: '#FFF0F5',
+    borderRadius: 16,
+    marginBottom: 24,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
+    shadowRadius: 4,
     elevation: 3,
+  },
+  statItem: {
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    minWidth: '28%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  statValue: {
+    fontSize: 28,
+    fontFamily: FontFamily.bold,
+    color: '#333',
+    marginBottom: 4,
+    marginTop: 4,
   },
   statLabel: {
     fontSize: 12,
+    fontFamily: FontFamily.medium,
     color: '#666',
-    marginTop: 5,
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 3,
   },
   buttonContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
-  actionContainer: { marginTop: 10, padding: 10, backgroundColor: '#f9f9f9', borderRadius: 5 },
+  actionContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
   actionTitle: { fontSize: 16, fontWeight: 'bold' },
   adultAction: { fontSize: 14, marginLeft: 10 },
   emptyContainer: { marginTop: 20, alignItems: 'center' },

@@ -20,27 +20,30 @@ export function useApiGeneric<T = any, U = any>(
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<any>(null);
 
-    const execute = useCallback(async (payload?: T) => {
+    const execute = useCallback(async (payload?: T, dynamicUrl?: string, id?: number) => {
         if (!config.condition) return null;
         setIsLoading(true);
         setError(null);
 
-        const headers: HeadersInit = {
-            'Content-Type': 'application/json',
-            'Accept': '*/*',
-            'Connection': 'keep-alive'
-        };
-
         try {
             const token = await getToken();
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
+            
+            if (!token) {
+                throw new Error('No authentication token found');
             }
 
-            console.log('Request URL:', config.url);
-            console.log('Request Headers:', headers);
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
 
-            const response = await fetch(config.url, {
+            const finalUrl = dynamicUrl || (id ? `${config.url}/${id}` : config.url);
+            console.log('Request URL:', finalUrl);
+            console.log('Request Headers:', headers);
+            console.log('Request Payload:', payload);
+            console.log('Request Method:', config.method);
+
+            const response = await fetch(finalUrl, {
                 method: config.method,
                 headers,
                 body: config.method !== 'GET' && payload ? JSON.stringify(payload) : undefined,
@@ -61,18 +64,15 @@ export function useApiGeneric<T = any, U = any>(
             }
 
             setData(responseData);
+            console.log('Response Data:', JSON.stringify(responseData, null, 2));
+            console.log('Data:', data);
             return responseData;
         } catch (err) {
-            const error = err as Error;
-            console.error('Network error details:', {
-                message: error.message,
-                name: error.name,
-                stack: error.stack,
-                url: config.url,
-                headers
-            });
-            setError(error);
-            throw error;
+            console.error('API Error:', err);
+            if (err instanceof Error && err.message === 'No authentication token found') {
+                router.replace("/login");
+            }
+            throw err;
         } finally {
             setIsLoading(false);
         }
