@@ -1,7 +1,12 @@
 // SwipeableItem.tsx
 import React, { FC, ReactNode } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
-import { PanGestureHandler, State, PanGestureHandlerStateChangeEvent, PanGestureHandlerEventPayload } from 'react-native-gesture-handler';
+import {
+  PanGestureHandler,
+  State,
+  HandlerStateChangeEvent,
+  PanGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
 import { FontFamily } from '@/constants/Fonts';
 
 interface SwipeableItemProps {
@@ -13,12 +18,16 @@ const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
   const translateX = new Animated.Value(0);
   const deleteButtonWidth = 80;
 
+  // 드래그(수평 이동) 이벤트
   const onGestureEvent = Animated.event(
     [{ nativeEvent: { translationX: translateX } }],
     { useNativeDriver: true }
   );
 
-  const onHandlerStateChange = (event: PanGestureHandlerStateChangeEvent<PanGestureHandlerEventPayload>) => {
+  // 제스처 상태 변경 이벤트
+  // HandlerStateChangeEvent를 제네릭으로 명시
+  const onHandlerStateChange = (event: HandlerStateChangeEvent<PanGestureHandlerEventPayload>) => {
+    // 제스처가 끝났을 때
     if (event.nativeEvent.state === State.END) {
       const { translationX } = event.nativeEvent;
       if (translationX < -deleteButtonWidth / 2) {
@@ -45,6 +54,7 @@ const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
 
   return (
     <View style={styles.container}>
+      {/* 삭제 버튼 */}
       <TouchableOpacity
         style={[styles.deleteButton, { width: deleteButtonWidth }]}
         onPress={onDelete}
@@ -52,30 +62,31 @@ const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
         <Text style={styles.deleteButtonText}>삭제</Text>
       </TouchableOpacity>
 
+      {/* 스와이프 가능 영역 */}
       <PanGestureHandler
         onGestureEvent={onGestureEvent}
         onHandlerStateChange={onHandlerStateChange}
         activeOffsetX={[-10, 10]}
         failOffsetY={[-20, 20]}
       >
-   <Animated.View
-  style={[
-    styles.content,
-    {
-      transform: [
-        {
-          translateX: translateX.interpolate({
-            inputRange: [-deleteButtonWidth, 0],
-            outputRange: [-deleteButtonWidth, 0],
-            extrapolate: 'clamp',
-          })
-        }
-      ]
-    }
-  ]}
->
-  {children}
-</Animated.View>
+        <Animated.View
+          style={[
+            styles.content,
+            {
+              transform: [
+                {
+                  translateX: translateX.interpolate({
+                    inputRange: [-deleteButtonWidth, 0],
+                    outputRange: [-deleteButtonWidth, 0],
+                    extrapolate: 'clamp',
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          {children}
+        </Animated.View>
       </PanGestureHandler>
     </View>
   );
