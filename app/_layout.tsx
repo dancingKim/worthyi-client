@@ -5,6 +5,8 @@ import React, { useEffect } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from "@/context/AuthContext";
 import { Stack } from 'expo-router';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
 
 // 가장 먼저 실행되도록 파일 최상단에 배치
 SplashScreen.preventAutoHideAsync()
@@ -49,13 +51,16 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <AuthProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(app)" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-        </Stack>
-      </ThemeProvider>
-    </AuthProvider>
+    <GestureHandlerRootView style={styles.container}>
+      <AuthProvider>
+        <Stack screenOptions={{headerShown: false}}/>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

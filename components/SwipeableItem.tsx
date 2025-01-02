@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import { FontFamily } from '@/constants/Fonts';
 
 interface SwipeableItemProps {
@@ -18,7 +18,7 @@ const SwipeableItem: React.FC<SwipeableItemProps> = ({ children, onDelete }) => 
     );
 
     const onHandlerStateChange = ({ nativeEvent }: any) => {
-        if (nativeEvent.state === 5) {  // END state
+        if (nativeEvent.state === State.END) {  // 명시적인 상태 사용
             const { translationX } = nativeEvent;
             
             if (translationX < -deleteButtonWidth / 2) {
