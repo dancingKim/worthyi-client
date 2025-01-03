@@ -15,6 +15,7 @@ SplashScreen.preventAutoHideAsync()
   });
 
 export default function RootLayout() {
+  console.log('Root layout rendering');
   const colorScheme = useColorScheme();
   
   const [loaded, error] = useFonts({
