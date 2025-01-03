@@ -34,6 +34,9 @@ const getLocalIpAddress = () => {
   
       const envSettings = envConfig[ENV] || envConfig.development;
   
+      // 디버깅을 위해 현재 ENV 값을 로그에 출력 (빌드 시 제거 가능)
+      console.log(`Current APP_ENV: ${ENV}`);
+  
       return {
           ...config,
           extra: {
