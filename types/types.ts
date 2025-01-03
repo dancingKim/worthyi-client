@@ -6,6 +6,24 @@ export interface ApiResponse<T> {
     message: string;
     data: T | null;
   }
+
+  export interface User {
+    id: number;
+    name: string;
+    email: string;
+    avatars?: Array<{
+      appearance: string;
+      id: number;
+    }>;
+  }
+
+
+  export interface AuthContextType {
+    isLoggedIn: boolean;
+    user: User | null; // Add user property
+    login: (token: string) => Promise<void>;
+    logout: () => void;
+  }
   
   /** 삭제 시 응답 (data가 null) */
   export interface DeleteResponse extends ApiResponse<null> {}

@@ -40,6 +40,7 @@ export const handleSocialLogin = async (provider: string, login: (token: string)
             const resultWithUrl = result as WebBrowserResultWithUrl;
             console.log("resultWithUrl:", resultWithUrl);
             const token = resultWithUrl.url ? extractTokenFromUrl(resultWithUrl.url) : null;
+            console.log("token:",token);
             if (token) {
                 await login(token);
                 router.push("/(app)/(tabs)");
