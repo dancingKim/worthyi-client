@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from "@/context/AuthContext";
-import { Slot } from 'expo-router';
+import { Slot, Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -66,11 +66,14 @@ export default function RootLayout() {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <GestureHandlerRootView style={styles.container}>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <AuthProvider>
-            <Slot />
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+            <Stack>
+              <Stack.Screen name="(app)" options={{ headerShown: false }} />
+              <Stack.Screen name="login" options={{ headerShown: false }} />
+            </Stack>
+          </ThemeProvider>
+        </AuthProvider>
       </GestureHandlerRootView>
     </ErrorBoundary>
   );

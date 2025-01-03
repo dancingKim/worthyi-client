@@ -23,6 +23,7 @@ export interface ApiResponse<T> {
     user: User | null; // Add user property
     login: (token: string) => Promise<void>;
     logout: () => void;
+    isLoading: boolean;
   }
   
   /** 삭제 시 응답 (data가 null) */
