@@ -1,35 +1,33 @@
-import { Text } from 'react-native';
-import { Redirect, Stack } from 'expo-router';
-import {useAuth} from "@/context/AuthContext";
+import { Stack, Redirect } from 'expo-router';
+import { useAuth } from "@/context/AuthContext";
 import Loading from "@/app/loading";
 
-
 export default function AppLayout() {
+    console.log('App layout rendering');
     const { isLoggedIn, isLoading } = useAuth();
 
-    console.log("(app) isLogined = " + isLoggedIn);
-    // You can keep the splash screen open, or render a loading screen like we do here.
     if (isLoading) {
         return <Loading/>;
     }
 
-    // Only require authentication within the (app) group's layout as users
-    // need to be able to access the (auth) group and sign in again.
     if (!isLoggedIn) {
-        console.log("(app) isLogined = " + isLoggedIn);
-        // On web, static rendering will stop here as the user is not authenticated
-        // in the headless Node process that the pages are rendered in.
+        console.log('Not logged in, redirecting to login');
         return <Redirect href="/login" />;
     }
 
-    console.log("(app) isLogined = " + isLoggedIn);
-
-    // This layout can be deferred because it's not the root layout.
+    console.log('Logged in, rendering Stack with tabs');
     return (
-        <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            {/*<Stack.Screen name="+not-found" />*/}
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: 'fade',
+            contentStyle: { backgroundColor: '#fff' }
+          }}
+        >
+            <Stack.Screen 
+                name="(tabs)" 
+                options={{ headerShown: false }} 
+            />
         </Stack>
     );
-
 }
