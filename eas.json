@@ -8,23 +8,33 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "APP_ENV": "development"
-      },
-      "environment": "development"
+        "NODE_ENV": "development"
+     }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "APP_ENV": "preview"
+        "NODE_ENV": "preview"
       },
-      "environment": "preview"
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "APP_ENV": "production"
+        "NODE_ENV": "production"
       },
-      "environment": "production"
+      "ios": {
+        "simulator": false,
+        "buildConfiguration": "Release"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
     }
   },
   "submit": {
