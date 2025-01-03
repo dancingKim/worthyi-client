@@ -7,6 +7,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { FontFamily } from '@/constants/Fonts';
 
 export default function TabLayout() {
+  console.log('TabLayout: rendering start');
   const colorScheme = useColorScheme();
 
   return (
@@ -14,6 +15,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
+        lazy: false,
         tabBarLabelStyle: {
           fontFamily: FontFamily.medium,
           fontSize: 12
