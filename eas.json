@@ -19,17 +19,13 @@
     },
     "preview": {
       "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
       "env": {
         "NODE_ENV": "preview"
       }
     },
-    "preview_simulator" : {
-      "extends" : "preview",
-      "ios": {
-        "simulator": true
-      }
-    },
-
     "production": {
       "autoIncrement": true,
       "env": {

@@ -1,33 +1,19 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
 
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
 
 export default function TabLayout() {
-  console.log('Tab layout rendering');
   const colorScheme = useColorScheme();
 
   return (
     <Tabs
       screenOptions={{
-        headerShown: false,
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        tabBarStyle: Platform.select({
-          ios: {
-            backgroundColor: '#fff',
-          },
-          android: {
-            backgroundColor: '#fff',
-            elevation: 0,
-            borderTopWidth: 1,
-            borderTopColor: '#eee',
-          },
-        }),
+        headerShown: false,
         tabBarLabelStyle: {
           fontFamily: FontFamily.medium,
           fontSize: 12
@@ -51,18 +37,15 @@ export default function TabLayout() {
           ),
         }}
       />
-        <Tabs.Screen
-            name={"profile"}
-        options={
-            {
-                title: 'Profile',
-                tabBarIcon: ({ color, focused }) => (
-                    <TabBarIcon name={focused ? 'man' : 'man-outline'} color={color} />
-                )
-            }
-        }>
-
-        </Tabs.Screen>
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'man' : 'man-outline'} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

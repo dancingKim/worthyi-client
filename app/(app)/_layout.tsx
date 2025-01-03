@@ -5,8 +5,10 @@ import Loading from "@/app/loading";
 export default function AppLayout() {
     console.log('App layout rendering');
     const { isLoggedIn, isLoading } = useAuth();
+    console.log('AppLayout: isLoggedIn =', isLoggedIn, 'isLoading =', isLoading);
 
     if (isLoading) {
+        console.log('AppLayout: showing loading screen');
         return <Loading/>;
     }
 
@@ -15,18 +17,15 @@ export default function AppLayout() {
         return <Redirect href="/login" />;
     }
 
-    console.log('Logged in, rendering Stack with tabs');
+    console.log('AppLayout: about to render Stack');
     return (
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: 'fade',
-            contentStyle: { backgroundColor: '#fff' }
-          }}
-        >
+        <Stack>
             <Stack.Screen 
                 name="(tabs)" 
-                options={{ headerShown: false }} 
+                options={{ 
+                    headerShown: false,
+                    animation: 'none'
+                }} 
             />
         </Stack>
     );

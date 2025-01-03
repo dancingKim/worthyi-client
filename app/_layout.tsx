@@ -7,12 +7,22 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Slot } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
+import { ErrorBoundary } from 'react-error-boundary';
+import { View, Text } from 'react-native';
 
 // 가장 먼저 실행되도록 파일 최상단에 배치
 SplashScreen.preventAutoHideAsync()
   .catch((err) => {
     console.error('Error preventing splash screen auto hide:', err);
   });
+
+function ErrorFallback() {
+  return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Text>앱 로딩 중 문제가 발생했습니다.</Text>
+    </View>
+  );
+}
 
 export default function RootLayout() {
   console.log('Root layout rendering');
@@ -30,16 +40,18 @@ export default function RootLayout() {
     'Pretendard-Black': require('../assets/fonts/Pretendard-Black.otf'),
   });
 
+  // 폰트 로딩 에러 처리 강화
+  if (error) {
+    console.error('Font loading failed:', error);
+  }
+
   useEffect(() => {
-    console.log('Font loading status:', loaded);
-    console.log('Font loading error:', error);  // 에러 로그 추가
     if (loaded) {
-      // 폰트 로딩이 완료되면 Splash Screen 숨기기
       SplashScreen.hideAsync().catch(err => {
         console.error('Error hiding splash screen:', err);
       });
     }
-  }, [loaded, error]);
+  }, [loaded]);
 
   // 에러 로깅을 console.error로 통일
   useEffect(() => {
@@ -52,13 +64,15 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <AuthProvider>
-          <Slot />
-        </AuthProvider>
-      </ThemeProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <GestureHandlerRootView style={styles.container}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <AuthProvider>
+            <Slot />
+          </AuthProvider>
+        </ThemeProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
 
