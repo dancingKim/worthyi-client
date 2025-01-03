@@ -1,7 +1,7 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from "@/context/AuthContext";
 import { Slot, Stack } from 'expo-router';
@@ -16,18 +16,35 @@ SplashScreen.preventAutoHideAsync()
     console.error('Error preventing splash screen auto hide:', err);
   });
 
-function ErrorFallback() {
+function ErrorFallback({ error, logs }: { error: Error, logs: string[] }) {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>앱 로딩 중 문제가 발생했습니다.</Text>
+      <Text>앱 로딩 중 문제가 발생했습니다: {error.message}</Text>
+      <Text>error name</Text>
+      <Text>{error.name}</Text>
+      <Text>error stack</Text>
+      <Text>{error.stack ?? 'No stack trace available'}</Text>
+      <Text>error cause</Text>
+      <Text>{String(error.cause) ?? 'No cause available'}</Text>
+      <Text>Logs:</Text>
+      {logs.map((log, index) => (
+        <Text key={index}>{log}</Text>
+      ))}
     </View>
   );
 }
 
 export default function RootLayout() {
-  console.log('Root layout rendering');
+  const [logs, setLogs] = useState<string[]>([]);
   const colorScheme = useColorScheme();
   
+  const logMessage = (message: string) => {
+    setLogs((prevLogs) => [...prevLogs, message]);
+    console.log(message);
+  };
+
+  logMessage('Root layout rendering');
+
   const [loaded, error] = useFonts({
     'Pretendard-Thin': require('../assets/fonts/Pretendard-Thin.otf'),
     'Pretendard-ExtraLight': require('../assets/fonts/Pretendard-ExtraLight.otf'),
@@ -42,13 +59,13 @@ export default function RootLayout() {
 
   // 폰트 로딩 에러 처리 강화
   if (error) {
-    console.error('Font loading failed:', error);
+    logMessage(`Font loading failed: ${error.message}`);
   }
 
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync().catch(err => {
-        console.error('Error hiding splash screen:', err);
+        logMessage(`Error hiding splash screen: ${err.message}`);
       });
     }
   }, [loaded]);
@@ -56,7 +73,7 @@ export default function RootLayout() {
   // 에러 로깅을 console.error로 통일
   useEffect(() => {
     if (error) {
-      console.error('Font loading error:', error);
+      logMessage(`Font loading error: ${error.message}`);
     }
   }, [error]);
 
@@ -64,7 +81,7 @@ export default function RootLayout() {
   if (!loaded) return null;
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <ErrorBoundary FallbackComponent={(props) => <ErrorFallback {...props} logs={logs} />}>
       <GestureHandlerRootView style={styles.container}>
         <AuthProvider>
           <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
