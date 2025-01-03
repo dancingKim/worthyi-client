@@ -9,7 +9,7 @@
       "distribution": "internal",
       "env": {
         "NODE_ENV": "development"
-     }
+      }
     },
     "preview": {
       "distribution": "internal",
@@ -17,7 +17,7 @@
         "NODE_ENV": "preview"
       },
       "ios": {
-        "simulator": true
+        "simulator": false
       },
       "android": {
         "buildType": "apk"
