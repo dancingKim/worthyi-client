@@ -19,7 +19,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.worthyi.worthyi",
-      "buildNumber": "1",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
@@ -41,7 +40,6 @@
         "monochromeImage": "./assets/images/Worthy-I-logo.png"
       },
       "package": "com.worthyi.worthyi",
-      "versionCode": 1,
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
