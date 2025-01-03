@@ -26,10 +26,6 @@ export default ({ config }) => {
             OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
             BASE_URL: "https://api-dev.worthyilife.com",
         },
-        preview_simulator: {
-            OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
-            BASE_URL: "https://api-dev.worthyilife.com",
-        },
         production: {
             OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
             BASE_URL: "https://api-dev.worthyilife.com",
