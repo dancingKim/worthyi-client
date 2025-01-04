@@ -43,7 +43,9 @@ export default function RootLayout() {
     console.log(message);
   };
 
-  logMessage('Root layout rendering');
+  useEffect(() => {
+    logMessage('Root layout rendering');
+  }, []);
 
   const [loaded, error] = useFonts({
     'Pretendard-Thin': require('../assets/fonts/Pretendard-Thin.otf'),

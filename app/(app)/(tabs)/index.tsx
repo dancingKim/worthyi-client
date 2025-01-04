@@ -62,7 +62,7 @@ const LAYOUT_HEIGHTS = {
       })
 };
 
-export const HomeScreen: React.FC = () => {
+export default function HomeScreen() {
   console.log('Home screen rendering');
   const insets = useSafeAreaInsets();
   const [childActionContent, setChildActionContent] = useState('');
