@@ -28,6 +28,8 @@
       }
     },
     "preview": {
+      "autoIncrement": true,
+      "developmentClient": true,
       "distribution": "internal",
       "env": {
         "NODE_ENV": "preview"
