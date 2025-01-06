@@ -17,7 +17,6 @@
     },
     "jsEngine": "hermes",
     "ios": {
-      "supportsTablet": true,
       "bundleIdentifier": "com.worthyilife.thanks",
       "infoPlist": {
         "NSAppTransportSecurity": {
