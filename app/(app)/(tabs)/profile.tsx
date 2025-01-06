@@ -6,9 +6,27 @@ import {useAuth} from "@/context/AuthContext";
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
 import { Ionicons } from '@expo/vector-icons';
+import { useApiGeneric } from "@/hooks/api/useApiGeneric";
+import Constants from 'expo-constants';
 
+const BASE_URL = Constants.expoConfig?.extra?.BASE_URL ?? '';
 const ProfileScreen = () => {
     const {user, logout} = useAuth();
+    const {data, isLoading, error, response, execute} = useApiGeneric({
+        method: 'POST',
+        url: `${BASE_URL}/auth/logout`,
+        condition: true,
+    });
+    
+    const handleLogout = async () => {
+        try {
+            await execute();
+        } catch (error) {
+            console.error('Logout execution failed:', error);
+        } finally {
+            logout();
+        }
+    };
 
     const handleNotionPress = () => {
         Linking.openURL('https://worthyilife.notion.site/Worthy-I-128f8a2dfd758048b6b3f4707d1565bf?pvs=4');
@@ -58,7 +76,7 @@ const ProfileScreen = () => {
                     <Ionicons name="mail-outline" size={24} color="#FF69B4" />
                     <Text style={styles.menuText}>의견 보내기</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={logout}>
+                <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                     <Ionicons name="log-out-outline" size={24} color="#FF69B4" />
                     <Text style={styles.menuText}>로그아웃</Text>
                 </TouchableOpacity>

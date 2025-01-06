@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import { User, AuthContextType } from '@/types/types';
-import { saveToken } from '@/utils/authStorage';
+import { removeToken, saveToken } from '@/utils/authStorage';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -18,6 +18,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
+    removeToken();
     setIsLoggedIn(false);
     setUser(null);
   };
