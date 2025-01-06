@@ -76,7 +76,7 @@
         "ascAppId": "6740054571"
       },
       "android": {
-        "serviceAccountKey": "@EAS_SECRET_SERVICE_ACCOUNT_KEY"
+        "serviceAccountKeyPath": "/secrets/config/worthy-i-dcc797b214f4.json"
       }
     }
   }

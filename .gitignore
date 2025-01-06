@@ -45,3 +45,9 @@ dist/
 web-build/
 /android
 /ios
+
+# Ignore service account key file
+/config/service-account-key.json
+
+# Ignore all files and folders under /secrets
+/secrets/
