@@ -18,7 +18,7 @@
     "jsEngine": "hermes",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.worthyi.worthyi",
+      "bundleIdentifier": "com.worthyilife.thanks",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
