@@ -18,15 +18,19 @@ const getLocalIpAddress = () => {
       const ENV = process.env.NODE_ENV || "development";
       
       const envConfig = {
+          preview: {
+              OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
+              BASE_URL: "https://api-dev.worthyilife.com",
+          },
         local: {
             OAUTH_BASE_URL: `http://${localIpAddress}.nip.io:8080`,
             BASE_URL: `http://${localIpAddress}:8080`,
         },
+        share: {
+            OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
+            BASE_URL: "https://api-dev.worthyilife.com",
+        },
           development: {
-              OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
-              BASE_URL: "https://api-dev.worthyilife.com",
-          },
-          preview: {
               OAUTH_BASE_URL: "https://api-dev.worthyilife.com",
               BASE_URL: "https://api-dev.worthyilife.com",
           },
