@@ -35,11 +35,11 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/Worthy-I-logo.png",
+        "foregroundImage": "./assets/images/android-app-icon.png",
         "backgroundColor": "#ffffff",
-        "monochromeImage": "./assets/images/Worthy-I-logo.png"
+        "monochromeImage": "./assets/images/android-app-icon.png"
       },
-      "package": "com.worthyi.worthyi",
+      "package": "com.worthyilife.thanks",
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
