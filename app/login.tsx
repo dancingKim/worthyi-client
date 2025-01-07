@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Image, SafeAreaView, ActivityIndicator } from "react-native";
-import SocialLoginButton from '@/components/buttons/SocialLoginButton'
-import { handleSocialLogin } from '@/utils/api';
+import SocialLoginButton from '@/components/buttons/SocialLoginButton';
+import { handleSocialLogin} from '@/utils/api';
 import { useAuth } from "@/context/AuthContext";
 import { FontFamily } from '@/constants/Fonts';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 const LoginScreen: React.FC = () => {
     const { login } = useAuth();
@@ -52,6 +53,16 @@ const LoginScreen: React.FC = () => {
                     <SocialLoginButton
                         provider="google"
                         onPress={() => handleLogin("google")}
+                    />
+                </View>
+
+                <View style={[styles.buttonContainer, { marginVertical: 8 }]}>
+                    <AppleAuthentication.AppleAuthenticationButton
+                        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                        cornerRadius={5}
+                        style={{ width: 200, height: 44 }}
+                        onPress={() => handleLogin("apple")}
                     />
                 </View>
             </View>

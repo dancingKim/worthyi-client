@@ -5,7 +5,6 @@
   },
   "build": {
     "local": {
-      "developmentClient": true,
       "distribution": "internal",
       "env": {
         "NODE_ENV": "local"
@@ -18,7 +17,6 @@
       }
     },
     "development": {
-      "developmentClient": true,
       "distribution": "internal",
       "env": {
         "NODE_ENV": "development"
