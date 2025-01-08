@@ -53,16 +53,12 @@ const LoginScreen: React.FC = () => {
                     <SocialLoginButton
                         provider="google"
                         onPress={() => handleLogin("google")}
-                        style={styles.socialButton}
                     />
                 </View>
 
                 <View style={styles.buttonContainer}>
-                    <AppleAuthentication.AppleAuthenticationButton
-                        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-                        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-                        cornerRadius={5}
-                        style={styles.socialButton}
+                    <SocialLoginButton
+                        provider="apple"
                         onPress={() => handleLogin("apple")}
                     />
                 </View>
