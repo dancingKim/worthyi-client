@@ -49,19 +49,20 @@ const LoginScreen: React.FC = () => {
                     로그인하고 다양한 서비스를 이용해보세요
                 </Text>
                 
-                <View style={[styles.buttonContainer, { marginVertical: 8 }]}>
+                <View style={styles.buttonContainer}>
                     <SocialLoginButton
                         provider="google"
                         onPress={() => handleLogin("google")}
+                        style={styles.socialButton}
                     />
                 </View>
 
-                <View style={[styles.buttonContainer, { marginVertical: 8 }]}>
+                <View style={styles.buttonContainer}>
                     <AppleAuthentication.AppleAuthenticationButton
                         buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                         buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
                         cornerRadius={5}
-                        style={{ width: 200, height: 44 }}
+                        style={styles.socialButton}
                         onPress={() => handleLogin("apple")}
                     />
                 </View>
@@ -102,8 +103,11 @@ const styles = StyleSheet.create({
     buttonContainer: {
         width: '100%',
         maxWidth: 320,
+        alignItems: 'center',
     },
     socialButton: {
+        width: 200,
+        height: 44,
         marginVertical: 8,
     },
 });
