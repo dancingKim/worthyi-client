@@ -106,7 +106,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     socialButton: {
-        width: 200,
+        width: '100%',
+        maxWidth: 320,
         height: 44,
         marginVertical: 8,
     },
