@@ -70,11 +70,11 @@
   "submit": {
     "production": {
       "ios": {
-        "appleId": "rightlight@gmail.com",
+        "appleId": "rightlightfg@gmail.com",
         "ascAppId": "6740054571"
       },
       "android": {
-        "serviceAccountKeyPath": "/secrets/config/worthy-i-dcc797b214f4.json"
+        "serviceAccountKeyPath": "./secrets/config/worthy-i-dcc797b214f4.json"
       }
     }
   }
