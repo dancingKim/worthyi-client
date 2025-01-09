@@ -14,7 +14,7 @@ const SocialLoginButton: React.FC<Props> = ({ provider, onPress }) => {
                 buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
                 buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
                 cornerRadius={5}
-                style={[styles.button, styles.appleButton]}
+                style={styles.appleButton}
                 onPress={onPress}
             />
         );
@@ -30,16 +30,20 @@ const SocialLoginButton: React.FC<Props> = ({ provider, onPress }) => {
 const styles = StyleSheet.create({
     button: {
         backgroundColor: "#4285F4",
-        padding: 15,
+        paddingVertical: 10,
+        paddingHorizontal: 15,
         borderRadius: 5,
         alignItems: "center",
+        justifyContent: "center",
         marginVertical: 10,
         width: '100%',
         maxWidth: 320,
-        height: 44,
+        height: 50,
     },
     appleButton: {
-        height: 44,
+        width: '100%',
+        maxWidth: 320,
+        height: 50,
     },
     text: {
         color: "#fff",
