@@ -81,6 +81,38 @@ const renderAuthButton = () => {
         }
     };
 
+    const deleteAccountApi = useApiGeneric({
+        method: 'DELETE',
+        url: `${BASE_URL}/user/me`,
+        condition: true,
+    });
+
+    const handleDeleteAccount = () => {
+        Alert.alert(
+            "계정 삭제",
+            "정말 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+            [
+                {
+                    text: "아니오",
+                    style: "cancel"
+                },
+                {
+                    text: "예",
+                    style: "destructive",
+                    onPress: async () => {
+                        try {
+                            await deleteAccountApi.execute();
+                            logout();
+                        } catch (error) {
+                            Alert.alert("오류", "계정 삭제 중 문제가 발생했습니다.");
+                        }
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
@@ -103,9 +135,15 @@ const renderAuthButton = () => {
                     <Ionicons name="mail-outline" size={24} color="#FF69B4" />
                     <Text style={styles.menuText}>의견 보내기</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-                    <Ionicons name="log-out-outline" size={24} color="#FF69B4" />
-                    <Text style={styles.menuText}>로그아웃</Text>
+                {renderAuthButton()}
+                <TouchableOpacity 
+                    style={[styles.menuItem, styles.deleteAccount]} 
+                    onPress={handleDeleteAccount}
+                >
+                    <Ionicons name="trash-outline" size={24} color="#FF0000" />
+                    <Text style={[styles.menuText, styles.deleteAccountText]}>
+                        계정 삭제
+                    </Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -176,5 +214,13 @@ const styles = StyleSheet.create({
         fontFamily: FontFamily.medium,
         color: '#333',
         marginLeft: 12,
+    },
+    deleteAccount: {
+        marginTop: 20,
+        borderColor: '#FF0000',
+        borderWidth: 1,
+    },
+    deleteAccountText: {
+        color: '#FF0000',
     },
 });
