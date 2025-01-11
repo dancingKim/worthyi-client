@@ -19,10 +19,13 @@ const SocialLoginButton: React.FC<Props> = ({ provider, onPress }) => {
             />
         );
     }
+    
+    
+    const capitalizedProvider = provider.charAt(0).toUpperCase() + provider.slice(1);
 
     return (
         <TouchableOpacity style={styles.button} onPress={onPress}>
-            <Text style={styles.text}>{provider}로 로그인</Text>
+            <Text style={styles.text}>{capitalizedProvider}로 로그인</Text>
         </TouchableOpacity>
     );
 };

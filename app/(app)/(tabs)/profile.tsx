@@ -8,8 +8,10 @@ import { FontFamily } from '@/constants/Fonts';
 import { Ionicons } from '@expo/vector-icons';
 import { useApiGeneric } from "@/hooks/api/useApiGeneric";
 import Constants from 'expo-constants';
-
+import { useRouter } from 'expo-router';
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL ?? '';
+
+
 const ProfileScreen = () => {
     const {user, logout} = useAuth();
     const {data, isLoading, error, response, execute} = useApiGeneric({
@@ -27,6 +29,31 @@ const ProfileScreen = () => {
             logout();
         }
     };
+
+    // 로그인 상태에 따라 버튼 렌더링
+const renderAuthButton = () => {
+    const { isLoggedIn } = useAuth();
+    const router = useRouter();
+  
+    if (isLoggedIn) {
+      return  (
+      <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+        <Ionicons name="log-out-outline" size={24} color="#FF69B4" />
+            <Text style={styles.menuText}>로그아웃</Text>
+            </TouchableOpacity>
+            );
+    } else {
+      return (
+        <TouchableOpacity 
+          onPress={() => router.push('/login')}
+          style={styles.menuItem}
+        >
+        <Ionicons name="log-in-outline" size={24} color="#FF69B4" />
+          <Text style={styles.menuText}>로그인</Text>
+        </TouchableOpacity>
+      );
+    }
+  };
 
     const handleNotionPress = () => {
         Linking.openURL('https://worthyilife.notion.site/Worthy-I-128f8a2dfd758048b6b3f4707d1565bf?pvs=4');
