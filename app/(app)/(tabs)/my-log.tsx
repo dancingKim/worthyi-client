@@ -1,5 +1,5 @@
 // app/(app)/(tabs)/my-log/index.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Alert, Button, ScrollView, Dimensions, SafeAreaView, FlatList } from 'react-native';
 import { useApiGeneric } from '@/hooks/api/useApiGeneric';
 import Constants from 'expo-constants';
@@ -9,6 +9,7 @@ import { Ionicons, AntDesign } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
+import { useFocusEffect } from '@react-navigation/native';
 
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
@@ -33,9 +34,12 @@ export default function MyLogScreen() {
     url: `${BASE_URL}/action/logs?date=${formatDate(selectedDate)}`
   });
 
-  useEffect(() => {
-    executeGetActions();
-  }, [selectedDate]);
+  // 탭 포커스될 때마다 데이터 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      executeGetActions();
+    }, [selectedDate])
+  );
 
   useEffect(() => {
     if (error) {
