@@ -37,10 +37,20 @@ const renderAuthButton = () => {
   
     if (isLoggedIn) {
       return  (
+        <View>
+
       <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
         <Ionicons name="log-out-outline" size={24} color="#FF69B4" />
             <Text style={styles.menuText}>로그아웃</Text>
             </TouchableOpacity>
+            <TouchableOpacity 
+            style={[styles.menuItem, styles.deleteAccount]} 
+            onPress={handleDeleteAccount}>
+                <Ionicons name="trash-outline" size={24} color="#FF69B4" />
+                <Text style={[styles.menuText, styles.menuText]}>
+                    계정 삭제</Text>
+                    </TouchableOpacity>
+        </View>
             );
     } else {
       return (
@@ -135,16 +145,7 @@ const renderAuthButton = () => {
                     <Ionicons name="mail-outline" size={24} color="#FF69B4" />
                     <Text style={styles.menuText}>의견 보내기</Text>
                 </TouchableOpacity>
-                {renderAuthButton()}
-                <TouchableOpacity 
-                    style={[styles.menuItem, styles.deleteAccount]} 
-                    onPress={handleDeleteAccount}
-                >
-                    <Ionicons name="trash-outline" size={24} color="#FF0000" />
-                    <Text style={[styles.menuText, styles.deleteAccountText]}>
-                        계정 삭제
-                    </Text>
-                </TouchableOpacity>
+                {renderAuthButton()}  
             </View>
         </SafeAreaView>
     );
