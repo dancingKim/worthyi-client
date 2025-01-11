@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '@/context/AuthContext';
 
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
 
@@ -25,11 +26,12 @@ export default function MyLogScreen() {
   const insets = useSafeAreaInsets();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   // date-fns format 함수를 커스텀 formatDate 함수로 교체
-  const dateStr = formatDate(selectedDate);
+
+  const {isLoggedIn} = useAuth();
 
   // API 훅
   const { data: actionData, error, isLoading, execute: executeGetActions } = useApiGeneric<null, ApiResponse<ActionLogResponse>>({
-    condition: true,
+    condition: isLoggedIn,
     method: 'GET',
     url: `${BASE_URL}/action/logs?date=${formatDate(selectedDate)}`
   });
@@ -37,7 +39,9 @@ export default function MyLogScreen() {
   // 탭 포커스될 때마다 데이터 새로고침
   useFocusEffect(
     useCallback(() => {
-      executeGetActions();
+      if (isLoggedIn) {
+        executeGetActions();
+      }
     }, [selectedDate])
   );
 

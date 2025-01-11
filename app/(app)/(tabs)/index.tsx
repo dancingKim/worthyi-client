@@ -40,6 +40,7 @@ import { useAdultActionApi } from '@/hooks/api/useAdultActionApi';
 
 import { CommonStyles } from '@/constants/Styles';
 import { FontFamily } from '@/constants/Fonts';
+import { useAuth } from '@/context/AuthContext';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -90,9 +91,11 @@ export default function HomeScreen() {
   }
   const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date()));
 
+  const {isLoggedIn} = useAuth();
+
   // 예: GET /action?date=xxxx
   const { data: dateData, execute: dateExecute } = useApiGeneric<null, ApiResponse<ActionResponse[]>>({
-    condition: true,
+    condition: isLoggedIn,
     method: 'GET',
     url: `${BASE_URL}/action?date=${selectedDate}`,
   });
@@ -113,9 +116,11 @@ export default function HomeScreen() {
 
   // 날짜 바뀔 때마다 GET
   useEffect(() => {
+    if (isLoggedIn) {
     (async () => {
       await dateExecute();
     })();
+  }
   }, [selectedDate]);
 
   // dateData -> 리스트
