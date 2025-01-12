@@ -369,8 +369,8 @@ export default function HomeScreen() {
                       actions={selectedChildAction.responses}
                       childActionId={selectedChildAction.id}
                       onDeleteItem={(adultId) => handleDeleteAdultAction(selectedChildAction.id, adultId)}
-                      isFlatListScrollable={true}
-                      contentContainerStyle={{ paddingBottom: 100 }}
+                      isFlatListScrollable={isFlatListScrollable}
+                      contentContainerStyle={{ paddingBottom: 100, flex: 1 }}
                     />
                   </View>
                 )}
