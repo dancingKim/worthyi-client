@@ -237,6 +237,43 @@ export default function HomeScreen() {
     setSelectedItemId('');
   };
 
+  const handleDeleteChildAction = async (id: number) => {
+    try {
+      await executeDeleteChildAction(null, `${BASE_URL}/action/child/${id}`);
+      setChildActionList(prev => prev.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('아동 행동 삭제 실패:', error);
+    }
+  };
+
+  // 어른 행동 삭제
+  const handleDeleteAdultAction = async (childActionId: number, adultActionId: number) => {
+    try {
+      await executeDeleteAdultAction(null, `${BASE_URL}/action/${childActionId}/adult/${adultActionId}`);
+      setSelectedChildAction(prev =>
+        prev
+          ? {
+              ...prev,
+              responses: prev.responses?.filter(r => r.id !== adultActionId) || [],
+            }
+          : null
+      );
+      setChildActionList(prev =>
+        prev.map(item =>
+          item.id === childActionId
+            ? {
+                ...item,
+                responses: item.responses?.filter(r => r.id !== adultActionId) || [],
+              }
+            : item
+        )
+      );
+    } catch (error) {
+      console.error('어른 행동 삭제 실패:', error);
+    }
+  };
+        
+
   // 애니메이션 스타일
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: currentPosition.value }],
@@ -335,6 +372,7 @@ export default function HomeScreen() {
                             actions={selectedChildAction.responses}
                             childActionId={selectedChildAction.id}
                             onDeleteItem={(adultId) => {
+                              handleDeleteAdultAction(selectedChildAction.id, adultId);
                               console.log('delete adult', adultId);
                             }}
                             isFlatListScrollable={true}
