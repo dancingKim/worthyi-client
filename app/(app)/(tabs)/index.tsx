@@ -351,51 +351,57 @@ export default function HomeScreen() {
           style={{ flex: 1 }}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View style={styles.modalContainer}>
-              <View style={[styles.modalContent, { paddingBottom: insets.bottom }]}>
-                <View style={styles.selectedActionContainer}>
-                  <Text style={styles.selectedActionLabel}>
-                    아이가 들려준 감사에요
-                  </Text>
-                  <Text style={styles.selectedActionContent}>
-                    {selectedChildAction?.content.text}
-                  </Text>
-                </View>
+            <FlatList
+              data={[{ key: 'content' }]} // Dummy data to enable FlatList
+              renderItem={() => (
+                <View style={styles.modalContainer}>
+                  <View style={[styles.modalContent, { paddingBottom: insets.bottom, flex: 1 }]}>
+                    <View style={styles.selectedActionContainer}>
+                      <Text style={styles.selectedActionLabel}>
+                        아이가 들려준 감사에요
+                      </Text>
+                      <Text style={styles.selectedActionContent}>
+                        {selectedChildAction?.content.text}
+                      </Text>
+                    </View>
 
-                {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
-                  <View style={styles.existingActionsContainer}>
-                    <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
-                    <AdultActionList
-                      actions={selectedChildAction.responses}
-                      childActionId={selectedChildAction.id}
-                      onDeleteItem={(adultId) => handleDeleteAdultAction(selectedChildAction.id, adultId)}
-                      isFlatListScrollable={isFlatListScrollable}
-                      contentContainerStyle={{ paddingBottom: 100, flex: 1 }}
-                    />
+                    {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
+                      <View style={styles.existingActionsContainer}>
+                        <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
+                        <AdultActionList
+                          actions={selectedChildAction.responses}
+                          childActionId={selectedChildAction.id}
+                          onDeleteItem={(adultId) => handleDeleteAdultAction(selectedChildAction.id, adultId)}
+                          isFlatListScrollable={true}
+                          contentContainerStyle={{ paddingBottom: 100 }}
+                        />
+                      </View>
+                    )}
+
+                    <View style={[styles.modalBottomContainer, { bottom: insets.bottom }]}>
+                      <View style={styles.adultActionInputContainer}>
+                        <TextInput
+                          style={styles.adultActionTextInput}
+                          placeholder="어른인 내가 칭찬을 해줘요"
+                          value={adultActionInput}
+                          onChangeText={setAdultActionInput}
+                          multiline
+                          textAlignVertical="top"
+                        />
+                        <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
+                          <AntDesign name="pluscircleo" size={30} color="black" />
+                        </TouchableOpacity>
+                      </View>
+
+                      <TouchableOpacity style={styles.completeButton} onPress={completePraise}>
+                        <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                )}
-
-                <View style={[styles.modalBottomContainer, { bottom: insets.bottom }]}>
-                  <View style={styles.adultActionInputContainer}>
-                    <TextInput
-                      style={styles.adultActionTextInput}
-                      placeholder="어른인 내가 칭찬을 해줘요"
-                      value={adultActionInput}
-                      onChangeText={setAdultActionInput}
-                      multiline
-                      textAlignVertical="top"
-                    />
-                    <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
-                      <AntDesign name="pluscircleo" size={30} color="black" />
-                    </TouchableOpacity>
-                  </View>
-
-                  <TouchableOpacity style={styles.completeButton} onPress={completePraise}>
-                    <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
-                  </TouchableOpacity>
                 </View>
-              </View>
-            </View>
+              )}
+              keyExtractor={(item) => item.key}
+            />
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </Modal>
