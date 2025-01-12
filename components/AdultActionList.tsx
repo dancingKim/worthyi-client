@@ -1,5 +1,5 @@
 // components/AdultActionList.tsx
-import React from 'react';
+import React, { useRef } from 'react';
 import { FlatList, View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { FontFamily } from '@/constants/Fonts';
@@ -21,8 +21,10 @@ export function AdultActionList({
   onDeleteItem,
   contentContainerStyle,
 }: AdultActionListProps) {
+  const scrollRef = useRef<FlatList>(null);
+
   const renderItem = ({ item }: { item: ActionResponse }) => (
-    <SwipeableItem onDelete={() => onDeleteItem(item.id)}>
+    <SwipeableItem onDelete={() => onDeleteItem(item.id)} scrollRef={scrollRef}>
       <View style={styles.itemContainer}>
         <Text style={styles.itemText}>{item.content.text}</Text>
         {item.responses && item.responses.length > 0 && (
@@ -36,6 +38,7 @@ export function AdultActionList({
 
   return (
     <FlatList
+      ref={scrollRef}
       data={actions}
       renderItem={renderItem}
       keyExtractor={(item) => item.id.toString()}

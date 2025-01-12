@@ -1,6 +1,6 @@
 // src/components/SwipeableItem.tsx
 import React, { FC, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, FlatList } from 'react-native';
 import {
   PanGestureHandler,
   State,
@@ -15,9 +15,11 @@ interface SwipeableItemProps {
   children: ReactNode;
   /** 스와이프 후 삭제 버튼을 눌렀을 때 실행할 함수 */
   onDelete: () => void;
+  /** 스와이프 대상 컴포넌트의 ref */
+  scrollRef: React.RefObject<FlatList>;
 }
 
-export const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) => {
+export const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete, scrollRef }) => {
   const translateX = new Animated.Value(0);
   const deleteButtonWidth = 80;
 
@@ -59,6 +61,8 @@ export const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete }) =>
         onHandlerStateChange={onHandlerStateChange}
         activeOffsetX={[-5, 5]}   // 가로 스와이프 감도
         failOffsetY={[-50, 50]}  // 수직으로 살짝 움직여도 실패 처리되지 않도록
+        simultaneousHandlers={scrollRef}
+        waitFor={scrollRef}
       >
         <Animated.View
           style={[
