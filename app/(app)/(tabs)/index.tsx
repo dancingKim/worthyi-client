@@ -353,43 +353,29 @@ export default function HomeScreen() {
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
-                <FlatList
-                  ListHeaderComponent={() => (
-                    <>
-                      <View style={styles.selectedActionContainer}>
-                        <Text style={styles.selectedActionLabel}>
-                          아이가 들려준 감사에요
-                        </Text>
-                        <Text style={styles.selectedActionContent}>
-                          {selectedChildAction?.content.text}
-                        </Text>
-                      </View>
+                <View style={styles.selectedActionContainer}>
+                  <Text style={styles.selectedActionLabel}>
+                    아이가 들려준 감사에요
+                  </Text>
+                  <Text style={styles.selectedActionContent}>
+                    {selectedChildAction?.content.text}
+                  </Text>
+                </View>
 
-                      {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
-                        <View style={styles.existingActionsContainer}>
-                          <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
-                          <AdultActionList
-                            actions={selectedChildAction.responses}
-                            childActionId={selectedChildAction.id}
-                            onDeleteItem={(adultId) => {
-                              handleDeleteAdultAction(selectedChildAction.id, adultId);
-                              console.log('delete adult', adultId);
-                            }}
-                            isFlatListScrollable={true}
-                            contentContainerStyle={{ paddingBottom: 100 }}
-                          />
-                        </View>
-                      )}
-                    </>
-                  )}
-                  data={[]} // 실 데이터를 FlatList로 표시할게 없으면 빈 배열
-                  renderItem={null}
-                  style={{ flex: 1 }}
-                  contentContainerStyle={{ padding: 20, paddingBottom: 180 }}
-                  showsVerticalScrollIndicator={false}
-                />
+                {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
+                  <View style={styles.existingActionsContainer}>
+                    <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
+                    <AdultActionList
+                      actions={selectedChildAction.responses}
+                      childActionId={selectedChildAction.id}
+                      onDeleteItem={(adultId) => handleDeleteAdultAction(selectedChildAction.id, adultId)}
+                      isFlatListScrollable={true}
+                      contentContainerStyle={{ paddingBottom: 100 }}
+                    />
+                  </View>
+                )}
 
-                <View style={styles.modalBottomContainer}>
+                <View style={[styles.modalBottomContainer, { bottom: insets.bottom }]}>
                   <View style={styles.adultActionInputContainer}>
                     <TextInput
                       style={styles.adultActionTextInput}
