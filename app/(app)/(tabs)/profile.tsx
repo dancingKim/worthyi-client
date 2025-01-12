@@ -122,18 +122,19 @@ const renderAuthButton = () => {
             { cancelable: false }
         );
     };
+    
 
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.profileImageContainer}>
                     <Image
-                        source={{ uri: user?.avatars?.[0]?.appearance || 'https://via.placeholder.com/150' }}
+                        source={require('@/assets/images/avatar-girl-transparent.png')}
                         style={styles.profileImage}
                     />
                 </View>
-                <Text style={styles.name}>{user?.name}</Text>
-                <Text style={styles.email}>{user?.email}</Text>
+                {/* <Text style={styles.name}>{user?.name}</Text> */}
+                {/* <Text style={styles.email}>{user?.email}</Text> */}
             </View>
 
             <View style={styles.menuContainer}>
