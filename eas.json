@@ -28,6 +28,7 @@
     "preview": {
       "autoIncrement": true,
       "developmentClient": true,
+      "channel": "preview",
       "distribution": "internal",
       "env": {
         "NODE_ENV": "preview"
@@ -42,6 +43,7 @@
     "share": {
       "autoIncrement": true,
       "distribution": "internal",
+      "channel": "share",
       "env": {
         "NODE_ENV": "share"
       },
@@ -54,6 +56,7 @@
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
       "env": {
         "NODE_ENV": "production",
         "SERVICE_ACCOUNT_KEY": "@EAS_SECRET_SERVICE_ACCOUNT_KEY"
