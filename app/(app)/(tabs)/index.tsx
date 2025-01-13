@@ -18,7 +18,6 @@ import {
   FlatList,
   GestureResponderEvent,
   PanResponderGestureState,
-  ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-native-reanimated';
@@ -353,53 +352,62 @@ export default function HomeScreen() {
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.modalContainer}>
-              <ScrollView
-                style={styles.modalContent}
-                contentContainerStyle={{ paddingBottom: insets.bottom }}
-                showsVerticalScrollIndicator={false}
-              >
-                <View style={styles.selectedActionContainer}>
-                  <Text style={styles.selectedActionLabel}>
-                    아이가 들려준 감사에요
-                  </Text>
-                  <Text style={styles.selectedActionContent}>
-                    {selectedChildAction?.content.text}
-                  </Text>
-                </View>
+              <View style={styles.modalContent}>
+                <FlatList
+                  ListHeaderComponent={() => (
+                    <>
+                      <View style={styles.selectedActionContainer}>
+                        <Text style={styles.selectedActionLabel}>
+                          아이가 들려준 감사에요
+                        </Text>
+                        <Text style={styles.selectedActionContent}>
+                          {selectedChildAction?.content.text}
+                        </Text>
+                      </View>
 
-                {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
-                  <View style={styles.existingActionsContainer}>
-                    <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
-                    <AdultActionList
-                      actions={selectedChildAction.responses}
-                      childActionId={selectedChildAction.id}
-                      onDeleteItem={(adultId) => handleDeleteAdultAction(selectedChildAction.id, adultId)}
-                      isFlatListScrollable={false}
-                      contentContainerStyle={{ paddingBottom: 100 }}
+                      {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
+                        <View style={styles.existingActionsContainer}>
+                          <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
+                          <AdultActionList
+                            actions={selectedChildAction.responses}
+                            childActionId={selectedChildAction.id}
+                            onDeleteItem={(adultId) => {
+                              handleDeleteAdultAction(selectedChildAction.id, adultId);
+                              console.log('delete adult', adultId);
+                            }}
+                            isFlatListScrollable={true}
+                            contentContainerStyle={{ paddingBottom: 100 }}
+                          />
+                        </View>
+                      )}
+                    </>
+                  )}
+                  data={[]} // 실 데이터를 FlatList로 표시할게 없으면 빈 배열
+                  renderItem={null}
+                  style={{ flex: 1 }}
+                  contentContainerStyle={{ padding: 20, paddingBottom: 180 }}
+                  showsVerticalScrollIndicator={false}
+                />
+
+                <View style={styles.modalBottomContainer}>
+                  <View style={styles.adultActionInputContainer}>
+                    <TextInput
+                      style={styles.adultActionTextInput}
+                      placeholder="어른인 내가 칭찬을 해줘요"
+                      value={adultActionInput}
+                      onChangeText={setAdultActionInput}
+                      multiline
+                      textAlignVertical="top"
                     />
+                    <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
+                      <AntDesign name="pluscircleo" size={30} color="black" />
+                    </TouchableOpacity>
                   </View>
-                )}
-              </ScrollView>
 
-              {/* Fixed Bottom Container */}
-              <View style={[styles.modalBottomContainer, { bottom: insets.bottom }]}>
-                <View style={styles.adultActionInputContainer}>
-                  <TextInput
-                    style={styles.adultActionTextInput}
-                    placeholder="어른인 내가 칭찬을 해줘요"
-                    value={adultActionInput}
-                    onChangeText={setAdultActionInput}
-                    multiline
-                    textAlignVertical="top"
-                  />
-                  <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
-                    <AntDesign name="pluscircleo" size={30} color="black" />
+                  <TouchableOpacity style={styles.completeButton} onPress={completePraise}>
+                    <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
                   </TouchableOpacity>
                 </View>
-
-                <TouchableOpacity style={styles.completeButton} onPress={completePraise}>
-                  <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
-                </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -464,72 +472,25 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    padding: 20,
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 25,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
     width: '100%',
-    height: '70%',
+    height: '80%',
     paddingTop: 25,
     overflow: 'hidden',
     position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  selectedActionContainer: {
-    margin: 15,
-    padding: 20,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#E9ECEF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  selectedActionLabel: {
-    fontSize: 14,
-    color: '#495057',
-    marginBottom: 8,
-    fontFamily: FontFamily.medium,
-    letterSpacing: 0.3,
-  },
-  selectedActionContent: {
-    fontSize: 16,
-    color: '#212529',
-    fontFamily: FontFamily.regular,
-    lineHeight: 24,
-  },
-  existingActionsContainer: {
-    margin: 15,
-    padding: 20,
-    backgroundColor: '#FFF9FB',
-    borderRadius: 15,
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#FFE3ED',
-  },
-  existingActionsLabel: {
-    fontSize: 14,
-    color: '#495057',
-    marginBottom: 12,
-    fontFamily: FontFamily.medium,
-    letterSpacing: 0.3,
   },
   modalBottomContainer: {
     padding: 20,
-    paddingBottom: 10,
+    borderTopWidth: 0.5,
+    borderTopColor: '#e0e0e0',
     backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#F1F3F5',
     width: '100%',
     position: 'absolute',
     bottom: 0,
@@ -538,7 +499,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 5,
   },
@@ -546,25 +507,23 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 18,
     gap: 12,
   },
   adultActionTextInput: {
     flex: 1,
     minHeight: 45,
     maxHeight: 80,
-    borderColor: '#DDE2E5',
-    borderWidth: 1.5,
+    borderColor: '#e8e8e8',
+    borderWidth: 1,
     borderRadius: 12,
     padding: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#fafafa',
     fontFamily: FontFamily.regular,
     fontSize: 15,
   },
   addButton: {
     padding: 8,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
   },
   completeButton: {
     backgroundColor: '#FF69B4',
@@ -573,7 +532,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignSelf: 'center',
     shadowColor: '#FF69B4',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 3,
@@ -581,7 +540,44 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: FontFamily.bold,
-    letterSpacing: 0.5,
+    fontFamily: FontFamily.medium,
+  },
+  selectedActionContainer: {
+    width: '100%',
+    marginBottom: 20,
+    padding: 16,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  selectedActionLabel: {
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 8,
+    fontFamily: FontFamily.medium,
+  },
+  selectedActionContent: {
+    fontSize: 16,
+    color: '#333',
+    fontFamily: FontFamily.regular,
+    lineHeight: 22,
+  },
+  existingActionsContainer: {
+    width: '100%',
+    marginBottom: 15,
+    padding: 18,
+    backgroundColor: '#FFF5F9',
+    borderRadius: 15,
+    flex: 1,
+  },
+  existingActionsLabel: {
+    fontSize: 14,
+    color: '#777',
+    marginBottom: 10,
+    fontFamily: FontFamily.medium,
   },
 });
