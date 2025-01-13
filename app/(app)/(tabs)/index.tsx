@@ -385,26 +385,27 @@ export default function HomeScreen() {
                   contentContainerStyle={{ padding: 20, paddingBottom: 180 }}
                   showsVerticalScrollIndicator={false}
                 />
+              </View>
 
-                <View style={[styles.modalBottomContainer, { bottom: insets.bottom }]}>
-                  <View style={styles.adultActionInputContainer}>
-                    <TextInput
-                      style={styles.adultActionTextInput}
-                      placeholder="어른인 내가 칭찬을 해줘요"
-                      value={adultActionInput}
-                      onChangeText={setAdultActionInput}
-                      multiline
-                      textAlignVertical="top"
-                    />
-                    <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
-                      <AntDesign name="pluscircleo" size={30} color="black" />
-                    </TouchableOpacity>
-                  </View>
-
-                  <TouchableOpacity style={styles.completeButton} onPress={completePraise}>
-                    <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
+              {/* Fixed Bottom Container */}
+              <View style={[styles.modalBottomContainer, { bottom: insets.bottom }]}>
+                <View style={styles.adultActionInputContainer}>
+                  <TextInput
+                    style={styles.adultActionTextInput}
+                    placeholder="어른인 내가 칭찬을 해줘요"
+                    value={adultActionInput}
+                    onChangeText={setAdultActionInput}
+                    multiline
+                    textAlignVertical="top"
+                  />
+                  <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
+                    <AntDesign name="pluscircleo" size={30} color="black" />
                   </TouchableOpacity>
                 </View>
+
+                <TouchableOpacity style={styles.completeButton} onPress={completePraise}>
+                  <Text style={[styles.buttonText, CommonStyles.button]}>완료</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -469,7 +470,6 @@ const styles = StyleSheet.create({
 
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
@@ -532,6 +532,7 @@ const styles = StyleSheet.create({
   },
   modalBottomContainer: {
     padding: 20,
+    paddingBottom: 10,
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#F1F3F5',
