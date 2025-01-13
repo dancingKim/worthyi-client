@@ -18,6 +18,7 @@ import {
   FlatList,
   GestureResponderEvent,
   PanResponderGestureState,
+  ScrollView,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, withTiming, useSharedValue } from 'react-native-reanimated';
@@ -352,40 +353,33 @@ export default function HomeScreen() {
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.modalContainer}>
-              <View style={[styles.modalContent, { paddingBottom: insets.bottom }]}>
-                <FlatList
-                  ListHeaderComponent={() => (
-                    <>
-                      <View style={styles.selectedActionContainer}>
-                        <Text style={styles.selectedActionLabel}>
-                          아이가 들려준 감사에요
-                        </Text>
-                        <Text style={styles.selectedActionContent}>
-                          {selectedChildAction?.content.text}
-                        </Text>
-                      </View>
+              <ScrollView
+                style={styles.modalContent}
+                contentContainerStyle={{ paddingBottom: insets.bottom }}
+                showsVerticalScrollIndicator={false}
+              >
+                <View style={styles.selectedActionContainer}>
+                  <Text style={styles.selectedActionLabel}>
+                    아이가 들려준 감사에요
+                  </Text>
+                  <Text style={styles.selectedActionContent}>
+                    {selectedChildAction?.content.text}
+                  </Text>
+                </View>
 
-                      {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
-                        <View style={styles.existingActionsContainer}>
-                          <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
-                          <AdultActionList
-                            actions={selectedChildAction.responses}
-                            childActionId={selectedChildAction.id}
-                            onDeleteItem={(adultId) => handleDeleteAdultAction(selectedChildAction.id, adultId)}
-                            isFlatListScrollable={true}
-                            contentContainerStyle={{ paddingBottom: 100 }}
-                          />
-                        </View>
-                      )}
-                    </>
-                  )}
-                  data={[null]}
-                  renderItem={() => null}
-                  style={{ flex: 1 }}
-                  contentContainerStyle={{ padding: 20, paddingBottom: 180 }}
-                  showsVerticalScrollIndicator={false}
-                />
-              </View>
+                {selectedChildAction?.responses && selectedChildAction.responses.length > 0 && (
+                  <View style={styles.existingActionsContainer}>
+                    <Text style={styles.existingActionsLabel}>받은 칭찬들</Text>
+                    <AdultActionList
+                      actions={selectedChildAction.responses}
+                      childActionId={selectedChildAction.id}
+                      onDeleteItem={(adultId) => handleDeleteAdultAction(selectedChildAction.id, adultId)}
+                      isFlatListScrollable={false}
+                      contentContainerStyle={{ paddingBottom: 100 }}
+                    />
+                  </View>
+                )}
+              </ScrollView>
 
               {/* Fixed Bottom Container */}
               <View style={[styles.modalBottomContainer, { bottom: insets.bottom }]}>
