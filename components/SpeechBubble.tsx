@@ -49,7 +49,7 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                             maxLength={200}
                             scrollEnabled={true}
                             editable={true}
-                            returnKeyType="done"
+                            returnKeyType="send"
                             onSubmitEditing={onPress}
                         />
                         <Text style={styles.charCount}>{value.length}/200</Text>

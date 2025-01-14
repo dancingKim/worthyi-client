@@ -295,8 +295,6 @@ export default function HomeScreen() {
                   onChangeText={setChildActionContent}
                   onPress={addChildAction}
                   buttonText="어른인 내게 감사 들려주기"
-                  returnKeyType="done"
-                  onSubmitEditing={addChildAction}
                 />
               </View>
               <View style={styles.avatarContainer}>
@@ -400,7 +398,7 @@ export default function HomeScreen() {
                       onChangeText={setAdultActionInput}
                       multiline
                       textAlignVertical="top"
-                      returnKeyType="done"
+                      returnKeyType="send"
                       onSubmitEditing={addAdultAction}
                     />
                     <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
