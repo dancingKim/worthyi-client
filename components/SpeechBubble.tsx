@@ -50,7 +50,11 @@ const SpeechBubble: React.FC<SpeechBubbleProps> = ({
                             scrollEnabled={true}
                             editable={true}
                             returnKeyType="send"
-                            onSubmitEditing={onPress}
+                            onKeyPress={({nativeEvent}) => {
+                                if (nativeEvent.key === 'Enter') {
+                                    onPress();
+                                }
+                            }}
                         />
                         <Text style={styles.charCount}>{value.length}/200</Text>
                     </View>

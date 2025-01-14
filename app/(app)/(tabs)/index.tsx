@@ -399,7 +399,11 @@ export default function HomeScreen() {
                       multiline
                       textAlignVertical="top"
                       returnKeyType="send"
-                      onSubmitEditing={addAdultAction}
+                      onKeyPress={({nativeEvent}) => {
+                        if (nativeEvent.key === 'Enter') {
+                          addAdultAction();
+                        }
+                      }}
                     />
                     <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
                       <AntDesign name="pluscircleo" size={30} color="black" />
