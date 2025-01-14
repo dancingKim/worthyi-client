@@ -41,6 +41,20 @@
       "typedRoutes": true
     },
     "owner": "worthyi",
-    "sdkVersion": "52.0.0"
+    "sdkVersion": "52.0.0",
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD",
+      "url": "https://u.expo.dev/ba041c45-0229-437a-8d3e-81aba979dd5b"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ba041c45-0229-437a-8d3e-81aba979dd5b"
+      }
+    }
   }
 }
