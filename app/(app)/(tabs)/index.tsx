@@ -295,6 +295,8 @@ export default function HomeScreen() {
                   onChangeText={setChildActionContent}
                   onPress={addChildAction}
                   buttonText="어른인 내게 감사 들려주기"
+                  returnKeyType="done"
+                  onSubmitEditing={addChildAction}
                 />
               </View>
               <View style={styles.avatarContainer}>
@@ -398,6 +400,8 @@ export default function HomeScreen() {
                       onChangeText={setAdultActionInput}
                       multiline
                       textAlignVertical="top"
+                      returnKeyType="done"
+                      onSubmitEditing={addAdultAction}
                     />
                     <TouchableOpacity style={styles.addButton} onPress={addAdultAction}>
                       <AntDesign name="pluscircleo" size={30} color="black" />

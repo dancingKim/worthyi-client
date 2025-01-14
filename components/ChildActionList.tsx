@@ -1,5 +1,5 @@
 // components/ChildActionList.tsx
-import React from 'react';
+import React, { useRef } from 'react';
 import { FlatList, TouchableOpacity, View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { FontFamily } from '@/constants/Fonts';
@@ -21,8 +21,10 @@ export function ChildActionList({
   onDeleteItem,
   contentContainerStyle,
 }: ChildActionListProps) {
+  const scrollRef = useRef<FlatList>(null);
+
   const renderItem = ({ item }: { item: ActionResponse }) => (
-    <SwipeableItem onDelete={() => onDeleteItem(item.id)}>
+    <SwipeableItem onDelete={() => onDeleteItem(item.id)} scrollRef={scrollRef}>
       <TouchableOpacity onLongPress={() => onLongPressItem(item)} delayLongPress={200}>
         <View style={styles.itemContainer}>
           <Text style={styles.itemText}>{item.content.text}</Text>
