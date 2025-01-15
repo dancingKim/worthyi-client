@@ -27,7 +27,7 @@ export function useApiGeneric<T = any, U = any>(
   // Refresh Token 로직
   const refreshToken = async (): Promise<string | null> => {
     try {
-      const response = await fetch('/auth/token/refresh', {
+      const response = await fetch('https://api-dev.worthyilife.com/auth/token/refresh', {
         method: 'POST',
         credentials: 'include', // HttpOnly 쿠키
       });
@@ -75,29 +75,13 @@ export function useApiGeneric<T = any, U = any>(
     console.log("responseData:", responseData);
     console.log("res.status:", res.status);
 
-    Alert.alert(
-        '[DEBUG] Checking expired condition',
-        `responseData.code: ${responseData.code}\n` +
-        `responseData.code === 40121 ? ${responseData.code === 40121}\n` +
-        `String(responseData.code) === '40121' ? ${String(responseData.code) === '40121'}\n` +
-        `isRetry: ${isRetry}`
-      );
-
 
     // 만약 accessToken 만료(HTTP 401 + code=40121)라면 → refresh
     if (responseData.code === 40121 && !isRetry) {
-        Alert.alert(
-            '[DEBUG] Access token expired',
-            'Attempting refresh...'
-          );
       console.log('Access token expired, attempting refresh...');
       const newToken = await refreshToken();
       if (newToken) {
         console.log('Token refreshed successfully:', newToken.slice(0, 10) + '...');
-        Alert.alert(
-            '[DEBUG] Refresh success',
-            `newToken: ${newToken.slice(0, 10)}...`
-          );
 
         // 기존 요청 재시도
         const newOptions = {
@@ -110,7 +94,6 @@ export function useApiGeneric<T = any, U = any>(
         return excuteRequest(url, newOptions, true);
       }
       // refresh 실패 시 → 로그인 화면으로 이동
-      Alert.alert('[DEBUG] Refresh failed', 'Redirecting to /login');
       console.log('Token refresh failed, redirecting to login...');
       router.replace('/login');
       throw new Error('다시 로그인이 필요합니다.');
