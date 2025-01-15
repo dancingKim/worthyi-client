@@ -4,6 +4,8 @@ import { useState, useCallback } from 'react';
 import { getToken, saveToken } from '@/utils/authStorage';
 import { ApiHookConfig, ApiHookResult, ApiResponse } from '@/types/types';
 import { router } from 'expo-router';
+import { Alert } from 'react-native';
+import { Alert } from 'react-native';
 
 /**
  * 공용 API 요청 훅
@@ -73,6 +75,9 @@ export function useApiGeneric<T = any, U = any>(
     console.log("responseData:", responseData);
     console.log("responseData:", responseData);
     console.log("res.status:", res.status);
+
+    Alert.alert("res:", res.toString());
+    Alert.alert("res.json:", res.json().toString());
 
     // 만약 accessToken 만료(HTTP 401 + code=40121)라면 → refresh
     if (String(responseData.code) === '40121' && !isRetry) {

@@ -10,7 +10,7 @@ export interface ApiResponse<T> {
   export interface User {
     id: number;
     name: string;
-    email: string;
+    email: string
     avatars?: Array<{
       appearance: string;
       id: number;
