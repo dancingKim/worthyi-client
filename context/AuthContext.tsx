@@ -1,4 +1,4 @@
-// src/context/AuthProvider.tsx
+// src/context/AuthContext.tsx
 import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
 import { User, AuthContextType } from '@/types/types';
 import { removeToken, saveToken, getToken } from '@/utils/authStorage';
@@ -21,27 +21,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // useUserMe 훅 가져오기
+  // user/me 훅
   const { execute: fetchUserMe } = useUserMe();
 
-  // 앱 시작 시 or 컴포넌트 마운트 시에 토큰/사용자 정보를 복원
+  // 앱 시작 시 토큰과 사용자 정보를 복원
   useEffect(() => {
     const initAuth = async () => {
       try {
         const token = await getToken();
         if (token) {
-          // 토큰이 있으면 isLoggedIn = true
           setIsLoggedIn(true);
-          // 여기서 /user/me 호출
-          const res = await fetchUserMe(); 
+          // /user/me 호출
+          const res = await fetchUserMe();
           // res => ApiResponse<UserMeResponse> | null
           if (res?.data) {
-            // 실제 UserMeResponse 객체
-            setUser(res.data);
+            setUser(res.data); // 전역 user정보 세팅
           }
         }
       } catch (err) {
-        console.error('Failed to restore token or fetch user info:', err);
+        console.error('Failed to restore user info:', err);
       } finally {
         setIsLoading(false);
       }
@@ -49,41 +47,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  // 로그인 시: 토큰 저장 + isLoggedIn = true
-  const login = async (token: string): Promise<void> => {
+  // 로그인 함수
+  const login = async (token: string) => {
     await saveToken(token);
     setIsLoggedIn(true);
-
-    // 토큰 기반으로 /user/me 다시 호출
+    // 로그인 후 user/me 호출
     try {
       const res = await fetchUserMe();
       if (res?.data) {
         setUser(res.data);
       }
     } catch (err) {
-      console.error('Failed to fetch user info after login:', err);
+      console.error('Error fetching user after login:', err);
     }
   };
 
-  // 로그아웃 시
-  const logout = () => {
-    removeToken();
+  // 로그아웃
+  const logout = async () => {
+    await removeToken();
     setIsLoggedIn(false);
     setUser(null);
   };
 
-  // AuthContext.Provider 리턴
-  return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout, isLoading }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value: AuthContextType = {
+    isLoggedIn,
+    user,
+    login,
+    logout,
+    isLoading,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context;
+  return ctx;
 };
