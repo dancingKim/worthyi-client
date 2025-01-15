@@ -75,8 +75,9 @@ export function useApiGeneric<T = any, U = any>(
     console.log("responseData:", responseData);
     console.log("res.status:", res.status);
 
-    Alert.alert("res:", res.toString());
-    Alert.alert("res.json:", res.json().toString());
+    Alert.alert("res:", JSON.stringify(res, null, 2)); // res 객체를 보기 쉽게 변환
+    Alert.alert("res.json:", JSON.stringify(responseData, null, 2)); // responseData의 내용을 보기 쉽게 변환
+
 
     // 만약 accessToken 만료(HTTP 401 + code=40121)라면 → refresh
     if (String(responseData.code) === '40121' && !isRetry) {
