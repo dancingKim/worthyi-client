@@ -25,56 +25,36 @@ export function useApiGeneric<T = any, U = any>(
   // ─────────────────────────────────────────────────────────────
 
   // Refresh Token 로직
-  // Refresh Token 로직
-const refreshToken = async (): Promise<string | null> => {
-    Alert.alert(
-      '[DEBUG] Enter refreshToken()',
-      'Starting fetch("/auth/token/refresh")...'
-    );
-  
+  const refreshToken = async (): Promise<string | null> => {
     try {
       const response = await fetch('/auth/token/refresh', {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // HttpOnly 쿠키
       });
-  
-      // fetch 결과 디버깅
-      Alert.alert(
-        '[DEBUG] refreshToken fetch status',
-        `response.ok: ${response.ok}, status: ${response.status}`
-      );
-  
       const responseData: ApiResponse<{ accessToken: string }> = await response.json();
-  
-      Alert.alert(
-        '[DEBUG] refreshToken response.json',
-        JSON.stringify(responseData, null, 2)
-      );
-  
+
+      console.log("response:", response);
+      console.log("responseData:", responseData);
+
       // 200 OK이고, data.accessToken 있으면 저장
       if (response.ok && responseData.data?.accessToken) {
         const newAccessToken = responseData.data.accessToken;
-  
-        // 저장
+        // SecureStore 에 저장
         await saveToken(newAccessToken);
-        Alert.alert('[DEBUG] refreshToken success', newAccessToken.slice(0, 10) + '...');
+        // 전역 AuthContext를 갱신하지 않음(→ circular dependency 피함)
         return newAccessToken;
       }
-  
-      // refresh 실패
-      Alert.alert('[DEBUG] refreshToken fail', 'Returning null');
+
+      // refresh 실패하면 null
       return null;
-  
     } catch (err) {
       console.error('Token Refresh Error:', err);
-      Alert.alert('[DEBUG] refreshToken exception', String(err));
       return null;
     }
   };
 
   // 내부 요청 수행 함수
-  // 내부 요청 수행 함수
-const excuteRequest = async (
+  const excuteRequest = async (
     url: string,
     options: RequestInit,
     isRetry: boolean = false
@@ -82,38 +62,44 @@ const excuteRequest = async (
     // 실제 요청
     const res = await fetch(url, options);
     setResponse(res);
-  
+
     let responseData: any = {};
     try {
       responseData = await res.json();
     } catch (err) {
       console.warn('Failed to parse JSON response:', err);
     }
-  
-    // 디버깅용 Alert:
+
+    console.log("res:",res);
+    console.log("responseData:", responseData);
+    console.log("responseData:", responseData);
+    console.log("res.status:", res.status);
+
+    Alert.alert("res:", JSON.stringify(res, null, 2)); // res 객체를 보기 쉽게 변환
+    Alert.alert("res.json:", JSON.stringify(responseData, null, 2)); // responseData의 내용을 보기 쉽게 변환
     Alert.alert(
-      '[DEBUG] Checking expired condition',
-      `responseData.code: ${responseData.code}\n` +
-      `responseData.code === 40121 ? ${responseData.code === 40121}\n` +
-      `isRetry: ${isRetry}`
-    );
-  
-    // 만약 accessToken 만료(= code=40121) && isRetry=false → refresh
-    if (responseData.code === 40121 && !isRetry) {
-      Alert.alert(
-        '[DEBUG] Access token expired',
-        'Attempting refresh...'
+        '[DEBUG] Checking expired condition',
+        `responseData.code: ${responseData.code}\n` +
+        `responseData.code === 40121 ? ${responseData.code === 40121}\n` +
+        `isRetry: ${isRetry}`
       );
+
+
+    // 만약 accessToken 만료(HTTP 401 + code=40121)라면 → refresh
+    if (responseData.code === 40121 && !isRetry) {
+        Alert.alert(
+            '[DEBUG] Access token expired',
+            'Attempting refresh...'
+          );
       console.log('Access token expired, attempting refresh...');
       const newToken = await refreshToken();
-  
       if (newToken) {
         console.log('Token refreshed successfully:', newToken.slice(0, 10) + '...');
         Alert.alert(
-          '[DEBUG] Refresh success',
-          `newToken: ${newToken.slice(0, 10)}...`
-        );
-  
+            '[DEBUG] Refresh success',
+            `newToken: ${newToken.slice(0, 10)}...`
+          );
+
         // 기존 요청 재시도
         const newOptions = {
           ...options,
@@ -124,26 +110,8 @@ const excuteRequest = async (
         };
         return excuteRequest(url, newOptions, true);
       }
-  
       // refresh 실패 시 → 로그인 화면으로 이동
-      console.log('Token refresh failed, redirecting to login...');
       Alert.alert('[DEBUG] Refresh failed', 'Redirecting to /login');
-      router.replace('/login');
-      throw new Error('다시 로그인이 필요합니다.');
-    }
-  
-    if (!res.ok) {
-      console.error('API Error:', {
-        status: res.status,
-        statusText: res.statusText,
-        code: responseData.code,
-        message: responseData.message,
-      });
-    }
-  
-    return responseData;
-  };
-      // refresh 실패 시 → 로그인 화면으로 이동
       console.log('Token refresh failed, redirecting to login...');
       router.replace('/login');
       throw new Error('다시 로그인이 필요합니다.');
