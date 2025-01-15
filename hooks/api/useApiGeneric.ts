@@ -32,6 +32,9 @@ export function useApiGeneric<T = any, U = any>(
       });
       const responseData: ApiResponse<{ accessToken: string }> = await response.json();
 
+      console.log("response:", response);
+      console.log("responseData:", responseData);
+
       // 200 OK이고, data.accessToken 있으면 저장
       if (response.ok && responseData.data?.accessToken) {
         const newAccessToken = responseData.data.accessToken;
@@ -65,6 +68,11 @@ export function useApiGeneric<T = any, U = any>(
     } catch (err) {
       console.warn('Failed to parse JSON response:', err);
     }
+
+    console.log("res:",res);
+    console.log("responseData:", responseData);
+    console.log("responseData:", responseData);
+    console.log("res.status:", res.status);
 
     // 만약 accessToken 만료(HTTP 401 + code=40121)라면 → refresh
     if (res.status === 401 && String(responseData.code) === '40121' && !isRetry) {
