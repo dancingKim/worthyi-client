@@ -15,6 +15,7 @@ export const handleSocialLogin = async (provider: string,login: (token: string) 
   const OAUTH_BASE_URL = Constants.expoConfig?.extra?.OAUTH_BASE_URL;
   const FRONTEND_URL = Linking.createURL('');
   const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${FRONTEND_URL}`;
+  console.log("AUTH_URL:", AUTH_URL);
 
   try {
     const result = await WebBrowser.openAuthSessionAsync(AUTH_URL, FRONTEND_URL);

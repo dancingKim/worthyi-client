@@ -16,6 +16,7 @@ const getLocalIpAddress = () => {
   export default ({ config }) => {
       const localIpAddress = getLocalIpAddress();
       const ENV = process.env.NODE_ENV || "development";
+      console.log("localIpAddress:",localIpAddress);
       
       const envConfig = {
           preview: {
@@ -47,6 +48,20 @@ const getLocalIpAddress = () => {
   
       return {
           ...config,
+          ios: {
+              ...config.ios,
+              infoPlist: ENV === 'local' ? {
+                  NSAppTransportSecurity: {
+                      NSAllowsArbitraryLoads: true,
+                      NSExceptionDomains: {
+                          localhost: {
+                              NSTemporaryExceptionAllowsInsecureHTTPLoads: true,
+                              NSIncludesSubdomains: true
+                          }
+                      }
+                  }
+              } : {},
+          },
           extra: {
               eas: {
                   projectId: "ba041c45-0229-437a-8d3e-81aba979dd5b"

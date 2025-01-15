@@ -5,16 +5,23 @@ import { removeToken, saveToken } from '@/utils/authStorage';
 interface AuthProviderProps {
   children: ReactNode;
 }
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const login = async (token: string): Promise<void>=> {
-    saveToken(token);
+
+  // 사용자가 로그인할 때 호출. 토큰 저장 + 로그인 상태 true
+  const login = async (token: string): Promise<void> => {
+    // SecureStore 에 저장
+    await saveToken(token);
     setIsLoggedIn(true);
-    setUser(user);
+    // TODO: 사용자 정보를 토큰을 통해 불러오고 싶다면, 
+    // 여기서 서버에 /user/me 요청해서 setUser(...) 가능
+    // 예: const userData = await fetchUserInfoFromServer(token);
+    // setUser(userData);
   };
 
   const logout = () => {
