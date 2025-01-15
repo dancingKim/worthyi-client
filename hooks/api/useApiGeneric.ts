@@ -75,7 +75,7 @@ export function useApiGeneric<T = any, U = any>(
     console.log("res.status:", res.status);
 
     // 만약 accessToken 만료(HTTP 401 + code=40121)라면 → refresh
-    if (res.status === 401 && String(responseData.code) === '40121' && !isRetry) {
+    if (String(responseData.code) === '40121' && !isRetry) {
       console.log('Access token expired, attempting refresh...');
       const newToken = await refreshToken();
       if (newToken) {
