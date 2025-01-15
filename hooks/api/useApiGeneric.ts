@@ -75,12 +75,11 @@ export function useApiGeneric<T = any, U = any>(
     console.log("responseData:", responseData);
     console.log("res.status:", res.status);
 
-    Alert.alert("res:", JSON.stringify(res, null, 2)); // res 객체를 보기 쉽게 변환
-    Alert.alert("res.json:", JSON.stringify(responseData, null, 2)); // responseData의 내용을 보기 쉽게 변환
     Alert.alert(
         '[DEBUG] Checking expired condition',
         `responseData.code: ${responseData.code}\n` +
         `responseData.code === 40121 ? ${responseData.code === 40121}\n` +
+        `String(responseData.code) === '40121' ? ${String(responseData.code) === '40121'}\n` +
         `isRetry: ${isRetry}`
       );
 
@@ -158,7 +157,7 @@ export function useApiGeneric<T = any, U = any>(
 
         const responseData = await excuteRequest(finalUrl, options);
         setData(responseData);
-        return responseData;
+        return responseData
       } catch (err) {
         console.error('API Error in useApiGeneric:', err);
         if (err instanceof Error && err.message === 'No authentication token found') {
