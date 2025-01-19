@@ -46,10 +46,21 @@ const getLocalIpAddress = () => {
       // 디버깅을 위해 현재 ENV 값을 로그에 출력 (빌드 시 제거 가능)
       console.log(`Current APP_ENV: ${ENV}`);
   
+      // 프로필에 따른 앱 이름 설정
+      const appName = ENV === 'production' ? "Worthy I" : `Worthy I - ${ENV}`;
+  
+      // 프로필에 따른 iOS bundleIdentifier 설정
+      const iosBundleIdentifier = ENV === 'production' ? "com.worthyilife.thanks" : `com.worthyilife.thanks.${ENV}`;
+  
+      // 프로필에 따른 Android package 설정
+      const androidPackage = ENV === 'production' ? "com.worthyilife.thanks" : `com.worthyilife.thanks.${ENV}`;
+  
       return {
           ...config,
+          name: appName,
           ios: {
               ...config.ios,
+              bundleIdentifier: iosBundleIdentifier,
               infoPlist: ENV === 'local' ? {
                   NSAppTransportSecurity: {
                       NSAllowsArbitraryLoads: true,
@@ -61,6 +72,10 @@ const getLocalIpAddress = () => {
                       }
                   }
               } : {},
+          },
+          android: {
+              ...config.android,
+              package: androidPackage,
           },
           extra: {
               eas: {
