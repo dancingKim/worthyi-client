@@ -11,7 +11,7 @@ interface WebBrowserResultWithUrl extends WebBrowser.WebBrowserResult {
   url: string;
 }
 
-export const handleSocialLogin = async (provider: string,login: (token: string) => Promise<void>) => {
+export const handleSocialLogin = async (provider: string, login: (accessToken: string, refreshToken: string) => Promise<void>) => {
   const OAUTH_BASE_URL = Constants.expoConfig?.extra?.OAUTH_BASE_URL;
   const FRONTEND_URL = Linking.createURL('');
   const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${FRONTEND_URL}`;
@@ -19,14 +19,22 @@ export const handleSocialLogin = async (provider: string,login: (token: string) 
 
   try {
     const result = await WebBrowser.openAuthSessionAsync(AUTH_URL, FRONTEND_URL);
+    console.log("login result:", result);
 
     if (result.type === "success" || (Platform.OS === 'android' && result.type === "dismiss")) {
       const resultWithUrl = result as WebBrowserResultWithUrl;
-      const token = resultWithUrl.url ? extractTokenFromUrl(resultWithUrl.url) : null;
+      const code = resultWithUrl.url ? extractCodeFromUrl(resultWithUrl.url) : null;
+      
 
-      if (token) {
-        await login(token);
-        router.push("/(app)/(tabs)");
+      if (code) {
+        const tokens = await exchangeCodeForTokens(code);
+        if (tokens) {
+          const { accessToken, refreshToken } = tokens;
+          await login(accessToken, refreshToken);
+          router.push("/(app)/(tabs)");
+        } else {
+          Alert.alert('Token exchange failed');
+        }
       }
     }
   } catch (error) {
@@ -42,15 +50,42 @@ export const handleSocialLogin = async (provider: string,login: (token: string) 
   }
 };
 
-const extractTokenFromUrl = (url: string): string | undefined => {
+async function exchangeCodeForTokens(code: string) {
+  try {
+    const BASE_URL = Constants.expoConfig?.extra?.BASE_URL;
+    const response = await fetch(`${BASE_URL}/auth/token`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ authCode: code }),
+    });
+    const json = await response.json();
+    if (!response.ok) {
+      console.log('Token exchange failed:', json);
+      return;
+    }
+    // { code:200, data:{ accessToken, refreshToken } }
+    if (json.data?.accessToken && json.data?.refreshToken) {
+      return {
+        accessToken: json.data.accessToken,
+        refreshToken: json.data.refreshToken,
+      };
+    }
+    Alert.alert('Login success!');
+  } catch (err) {
+    console.error('Exchange error:', err);
+    Alert.alert('Exchange error', String(err));
+  }
+}
+
+const extractCodeFromUrl = (url: string): string | undefined => {
     const parsedUrl = Linking.parse(url);
-    const rawToken = parsedUrl.queryParams?.token;
+    const rawCode = parsedUrl.queryParams?.code;
 
     // 토큰이 배열일 경우 첫 번째 값 반환
-    if (Array.isArray(rawToken)) {
-        return rawToken[0];
+    if (Array.isArray(rawCode)) {
+        return rawCode[0];
     }
 
     // 토큰이 문자열일 경우 그대로 반환
-    return typeof rawToken === "string" ? rawToken : undefined;
+    return typeof rawCode === "string" ? rawCode : undefined;
 }

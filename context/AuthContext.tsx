@@ -1,7 +1,7 @@
 // src/context/AuthContext.tsx
 import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
 import { User, AuthContextType } from '@/types/types';
-import { removeToken, saveToken, getToken } from '@/utils/authStorage';
+import { removeToken, saveToken, getToken, saveTokenByType } from '@/utils/authStorage';
 import { useUserMe } from '@/hooks/api/useUserMe';
 
 interface UserMeResponse {
@@ -48,8 +48,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   // 로그인 함수
-  const login = async (token: string) => {
-    await saveToken(token);
+  const login = async (accessToken: string, refreshToken: string) => {
+    await saveToken(accessToken);
+    await saveTokenByType("refresh_token", refreshToken);
     setIsLoggedIn(true);
     // 로그인 후 user/me 호출
     try {

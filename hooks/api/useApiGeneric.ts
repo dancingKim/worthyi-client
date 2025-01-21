@@ -1,7 +1,7 @@
 // src/hooks/useApiGeneric.ts
 
 import { useState, useCallback } from 'react';
-import { getToken, saveToken } from '@/utils/authStorage';
+import { getToken, getTokenByType, saveToken } from '@/utils/authStorage';
 import { ApiHookConfig, ApiHookResult, ApiResponse } from '@/types/types';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
@@ -27,9 +27,17 @@ export function useApiGeneric<T = any, U = any>(
   // Refresh Token 로직
   const refreshToken = async (): Promise<string | null> => {
     try {
+          // 1) SecureStore 등에서 refreshToken 꺼내기
+    const storedRefreshToken = await getTokenByType("refresh_token");
+    if (!storedRefreshToken) {
+      console.log('No stored refresh token found');
+      return null;
+    }
+
       const response = await fetch('https://api-dev.worthyilife.com/auth/token/refresh', {
         method: 'POST',
-        credentials: 'include', // HttpOnly 쿠키
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken: storedRefreshToken }),
       });
       const responseData: ApiResponse<{ accessToken: string }> = await response.json();
 

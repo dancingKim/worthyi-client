@@ -21,7 +21,7 @@ export interface ApiResponse<T> {
   export interface AuthContextType {
     isLoggedIn: boolean;
     user: User | null; // Add user property
-    login: (token: string) => Promise<void>;
+    login: (accessToken: string, refreshToken: string) => Promise<void>;
     logout: () => void;
     isLoading: boolean;
   }
