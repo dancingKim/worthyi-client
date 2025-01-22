@@ -15,37 +15,37 @@ export const handleSocialLogin = async (provider: string, login: (accessToken: s
   const OAUTH_BASE_URL = Constants.expoConfig?.extra?.OAUTH_BASE_URL;
   const FRONTEND_URL = Linking.createURL('');
   const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${FRONTEND_URL}`;
-  console.log("AUTH_URL:", AUTH_URL);
 
   try {
     const result = await WebBrowser.openAuthSessionAsync(AUTH_URL, FRONTEND_URL);
-    console.log("login result:", result);
 
     if (result.type === "success" || (Platform.OS === 'android' && result.type === "dismiss")) {
       const resultWithUrl = result as WebBrowserResultWithUrl;
       const code = resultWithUrl.url ? extractCodeFromUrl(resultWithUrl.url) : null;
+      console.log("code:", code);
       
 
       if (code) {
         const tokens = await exchangeCodeForTokens(code);
+        console.log("tokens:", tokens);
         if (tokens) {
           const { accessToken, refreshToken } = tokens;
           await login(accessToken, refreshToken);
           router.push("/(app)/(tabs)");
         } else {
-          Alert.alert('Token exchange failed');
+          console.log("token exchange failed");
         }
       }
     }
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === 'ERR_CANCELED') {
-        Alert.alert('Login canceled');
+        console.log("canceled");
       } else {
-        Alert.alert('Login error', error.message);
+        console.log("error:", error);
       }
     } else {
-      Alert.alert('An unknown error occurred');
+      console.log("error:", error);
     }
   }
 };
@@ -61,7 +61,7 @@ async function exchangeCodeForTokens(code: string) {
     const json = await response.json();
     if (!response.ok) {
       console.log('Token exchange failed:', json);
-      return;
+      return null;
     }
     // { code:200, data:{ accessToken, refreshToken } }
     if (json.data?.accessToken && json.data?.refreshToken) {
@@ -70,10 +70,9 @@ async function exchangeCodeForTokens(code: string) {
         refreshToken: json.data.refreshToken,
       };
     }
-    Alert.alert('Login success!');
   } catch (err) {
     console.error('Exchange error:', err);
-    Alert.alert('Exchange error', String(err));
+    return null;
   }
 }
 
