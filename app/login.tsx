@@ -5,15 +5,18 @@ import { handleSocialLogin} from '@/utils/api';
 import { useAuth } from "@/context/AuthContext";
 import { FontFamily } from '@/constants/Fonts';
 import * as AppleAuthentication from 'expo-apple-authentication';
+import { useRouter } from 'expo-router';
 
 const LoginScreen: React.FC = () => {
     const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
     const handleLogin = async (provider: string) => {
         try {
             setIsLoading(true);
             await handleSocialLogin(provider, login);
+            router.push('/');
         } catch (error) {
             console.error('Login failed:', error);
         } finally {

@@ -1,6 +1,6 @@
 // src/components/SwipeableItem.tsx
 import React, { FC, ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, FlatList, Platform } from 'react-native';
 import {
   PanGestureHandler,
   State,
@@ -61,8 +61,7 @@ export const SwipeableItem: FC<SwipeableItemProps> = ({ children, onDelete, scro
         onHandlerStateChange={onHandlerStateChange}
         activeOffsetX={[-5, 5]}   // 가로 스와이프 감도
         failOffsetY={[-50, 50]}  // 수직으로 살짝 움직여도 실패 처리되지 않도록
-        simultaneousHandlers={scrollRef}
-        waitFor={scrollRef}
+        {...(Platform.OS === 'ios' ? { simultaneousHandlers: scrollRef, waitFor: scrollRef } : {})}
       >
         <Animated.View
           style={[
