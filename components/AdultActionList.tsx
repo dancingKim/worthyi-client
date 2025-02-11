@@ -1,10 +1,11 @@
 // components/AdultActionList.tsx
 import React, { useRef } from 'react';
-import { FlatList, View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { FlatList, View, Text, StyleSheet, StyleProp, ViewStyle, Platform } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import { FontFamily } from '@/constants/Fonts';
 import { ActionResponse } from '@/types/types';
 import { SwipeableItem } from '@/components/SwipeableItem';
+import { AndroidActionItem } from '@/components/AndroidActionItem';
 
 interface AdultActionListProps {
   actions: ActionResponse[];
@@ -23,18 +24,24 @@ export function AdultActionList({
 }: AdultActionListProps) {
   const scrollRef = useRef<FlatList>(null);
 
-  const renderItem = ({ item }: { item: ActionResponse }) => (
-    <SwipeableItem onDelete={() => onDeleteItem(item.id)} scrollRef={scrollRef}>
-      <View style={styles.itemContainer}>
-        <Text style={styles.itemText}>{item.content.text}</Text>
-        {item.responses && item.responses.length > 0 && (
-          <View style={styles.checkContainer}>
-            <AntDesign name="checkcircle" size={16} color="#FF69B4" />
-          </View>
-        )}
-      </View>
-    </SwipeableItem>
-  );
+  const renderItem = ({ item }: { item: ActionResponse }) => {
+    const ItemComponent =
+      Platform.OS === 'android' ? AndroidActionItem : SwipeableItem;
+
+    return (
+      <ItemComponent onDelete={() => onDeleteItem(item.id)} scrollRef={scrollRef}>
+        <View style={styles.itemContainer}>
+          <Text style={styles.itemText}>{item.content.text}</Text>
+          {/* iOS의 경우 기존에 체크 아이콘(받은 칭찬 표시)을 추가 */}
+          {Platform.OS !== 'android' && item.responses && item.responses.length > 0 && (
+            <View style={styles.checkContainer}>
+              <AntDesign name="checkcircle" size={16} color="#FF69B4" />
+            </View>
+          )}
+        </View>
+      </ItemComponent>
+    );
+  };
 
   return (
     <FlatList
