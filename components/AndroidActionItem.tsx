@@ -12,7 +12,7 @@ export const AndroidActionItem: FC<AndroidActionItemProps> = ({ children, onDele
   return (
     <View style={styles.androidContainer}>
       <TouchableOpacity onPress={onDelete} style={styles.androidDeleteButton}>
-        <AntDesign name="checkcircle" size={20} color="#FF69B4" />
+        <AntDesign name="minuscircleo" size={20} color="#FF69B4" />
       </TouchableOpacity>
       <View style={styles.androidContent}>
         {children}
