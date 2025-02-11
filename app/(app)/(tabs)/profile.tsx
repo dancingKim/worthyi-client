@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     },
     header: {
         alignItems: 'center',
-        marginTop: 24,
+        marginTop: 60,
         marginBottom: 32,
     },
     profileImageContainer: {
