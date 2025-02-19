@@ -1,0 +1,77 @@
+.
+├── README.md
+├── app
+│   ├── (app)
+│   │   ├── (tabs)
+│   │   │   ├── _layout.tsx
+│   │   │   ├── my-log.tsx
+│   │   │   ├── index.tsx
+│   │   │   └── profile.tsx
+│   │   └── _layout.tsx
+│   ├── +html.tsx
+│   ├── +not-found.tsx
+│   ├── _layout.tsx
+│   ├── loading.tsx
+│   ├── login.tsx
+│   └── socialLogin.tsx
+├── app.config.js
+├── app.json
+├── assets
+│   ├── fonts
+│   │   └── SpaceMono-Regular.ttf
+│   └── images
+│       ├── adaptive-icon.png
+│       ├── avatar-pixel.png
+│       ├── avatar-rive.ase
+│       ├── favicon.png
+│       ├── icon.png
+│       ├── partial-react-logo.png
+│       ├── react-logo.png
+│       ├── react-logo@2x.png
+│       ├── react-logo@3x.png
+│       ├── splash.png
+│       ├── worthy i avatar.webp
+│       └── worthy-i-avatar.png
+├── babel.config.js
+├── components
+│   ├── Collapsible.tsx
+│   ├── ExternalLink.tsx
+│   ├── HelloWave.tsx
+│   ├── ParallaxScrollView.tsx
+│   ├── ThemedText.tsx
+│   ├── ThemedView.tsx
+│   ├── __tests__
+│   │   ├── ThemedText-test.tsx
+│   │   └── __snapshots__
+│   │       └── ThemedText-test.tsx.snap
+│   ├── buttons
+│   │   ├── LogOutButton.tsx
+│   │   └── SocialLoginButton.tsx
+│   └── navigation
+│       └── TabBarIcon.tsx
+├── constants
+│   └── Colors.ts
+├── context
+│   └── AuthContext.tsx
+├── eas.json
+├── expo-env.d.ts
+├── folder-structure.txt
+├── hooks
+│   ├── api
+│   │   └── useApiGeneric.ts
+│   ├── auth
+│   │   └── useDeepLinkingHandler.ts
+│   ├── useColorScheme.ts
+│   ├── useColorScheme.web.ts
+│   └── useThemeColor.ts
+├── ngrok.yml\015:
+├── ngrok.yml:q
+├── package.json
+├── tsconfig.json
+├── utils
+│   ├── api.ts
+│   ├── authStorage.ts
+│   └── errorHander.ts
+└── yarn.lock
+
+18 directories, 57 files

@@ -1,0 +1,86 @@
+{
+  "cli": {
+    "version": ">= 14.2.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "local": {
+      "distribution": "internal",
+      "channel": "local",
+      "env": {
+        "NODE_ENV": "local"
+      },
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "development": {
+      "distribution": "internal",
+      "channel": "development",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "ios": {
+        "simulator": true
+      }
+    },
+    "preview": {
+      "autoIncrement": true,
+      "developmentClient": true,
+      "channel": "preview",
+      "distribution": "internal",
+      "env": {
+        "NODE_ENV": "preview"
+      },
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "share": {
+      "autoIncrement": true,
+      "distribution": "internal",
+      "channel": "share",
+      "env": {
+        "NODE_ENV": "share"
+      },
+      "ios": {
+        "simulator": false
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "channel": "production",
+      "env": {
+        "NODE_ENV": "production",
+        "SERVICE_ACCOUNT_KEY": "@EAS_SECRET_SERVICE_ACCOUNT_KEY"
+      },
+      "ios": {
+        "simulator": false,
+        "buildConfiguration": "Release"
+      },
+      "android": {
+        "buildType": "app-bundle"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "rightlightfg@gmail.com",
+        "ascAppId": "6740054571"
+      },
+      "android": {
+        "serviceAccountKeyPath": "./secrets/config/worthy-i-dcc797b214f4.json"
+      }
+    }
+  }
+}
