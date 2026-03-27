@@ -14,7 +14,7 @@ interface WebBrowserResultWithUrl extends WebBrowser.WebBrowserResult {
 export const handleSocialLogin = async (provider: string, login: (accessToken: string, refreshToken: string) => Promise<void>) => {
   const OAUTH_BASE_URL = Constants.expoConfig?.extra?.OAUTH_BASE_URL;
   const FRONTEND_URL = Linking.createURL('');
-  const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_uri=${FRONTEND_URL}`;
+  const AUTH_URL = `${OAUTH_BASE_URL}/oauth2/authorization/${provider}?redirect_url=${encodeURIComponent(FRONTEND_URL)}`;
 
   try {
     const result = await WebBrowser.openAuthSessionAsync(AUTH_URL, FRONTEND_URL);
