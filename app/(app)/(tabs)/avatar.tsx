@@ -186,11 +186,6 @@ const AvatarScreen = () => {
           {isDefault ? '앱 기본 캐릭터' : avatarImage.generationModel}
         </Text>
 
-        {!isDefault && !!avatarImage.prompt && (
-          <Text style={styles.libraryPrompt} numberOfLines={2}>
-            {avatarImage.prompt}
-          </Text>
-        )}
 
         <View style={styles.libraryActions}>
           <TouchableOpacity
@@ -263,7 +258,7 @@ const AvatarScreen = () => {
           <TextInput
             style={styles.promptInput}
             multiline
-            placeholder="예: 눈 색을 에메랄드색으로 바꿔줘. 배경은 투명하게 유지해줘."
+            placeholder="예: 눈 색을 에메랄드색으로 바꿔줘. 배경은 깔끔한 흰색으로 유지해줘."
             placeholderTextColor="#B88BA3"
             value={prompt}
             onChangeText={setPrompt}
@@ -534,13 +529,6 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.medium,
     fontSize: 12,
     color: '#A26C88',
-  },
-  libraryPrompt: {
-    marginTop: 10,
-    fontFamily: FontFamily.regular,
-    fontSize: 13,
-    lineHeight: 20,
-    color: '#5D4754',
   },
   libraryActions: {
     marginTop: 16,
