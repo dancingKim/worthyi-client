@@ -1,11 +1,7 @@
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
 import Constants from "expo-constants";
-import {Alert} from "react-native";
-import {router} from "expo-router";
 import {Platform} from "react-native";
-import * as AppleAuthentication from 'expo-apple-authentication';
-import { useAuth } from '@/context/AuthContext';
 
 interface WebBrowserResultWithUrl extends WebBrowser.WebBrowserResult {
   url: string;
@@ -31,9 +27,8 @@ export const handleSocialLogin = async (provider: string, login: (accessToken: s
         if (tokens) {
           const { accessToken, refreshToken } = tokens;
           await login(accessToken, refreshToken);
-          router.push("/(app)/(tabs)");
         } else {
-          console.log("token exchange failed");
+          throw new Error("Token exchange failed");
         }
       }
     }
@@ -70,6 +65,7 @@ async function exchangeCodeForTokens(code: string) {
         refreshToken: json.data.refreshToken,
       };
     }
+    return null;
   } catch (err) {
     console.error('Exchange error:', err);
     return null;

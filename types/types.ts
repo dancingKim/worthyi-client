@@ -7,14 +7,41 @@ export interface ApiResponse<T> {
     data: T | null;
   }
 
+  export interface ActiveAvatarImage {
+    avatarImageId: number;
+    name: string;
+    imageUrl: string;
+  }
+
+  export interface AvatarImageItem {
+    avatarImageId: number;
+    name: string;
+    imageUrl: string;
+    prompt: string;
+    generationModel: string;
+    sourceType: string;
+    referenceType: string;
+    referenceAvatarImageId: number | null;
+    active: boolean;
+    deletable: boolean;
+  }
+
+  export interface AvatarImageCollectionResponse {
+    usesDefaultAvatar: boolean;
+    activeAvatarImage: AvatarImageItem | null;
+    avatarImages: AvatarImageItem[];
+  }
+
   export interface User {
-    id: number;
     name: string;
     email: string
     avatars?: Array<{
+      avatarId: number;
+      name: string;
       appearance: string;
-      id: number;
     }>;
+    usesDefaultAvatar?: boolean;
+    activeAvatarImage?: ActiveAvatarImage | null;
   }
 
 
@@ -22,7 +49,8 @@ export interface ApiResponse<T> {
     isLoggedIn: boolean;
     user: User | null; // Add user property
     login: (accessToken: string, refreshToken: string) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
+    refreshUser: () => Promise<User | null>;
     isLoading: boolean;
   }
   
@@ -50,13 +78,15 @@ export interface ApiResponse<T> {
   
   /** User 정보 (예시) */
   export interface UserMeResponse {
-    id: number;
     email: string;
     name: string;
     avatars?: Array<{
+      avatarId: number;
+      name: string;
       appearance: string;
-      id: number;
     }>;
+    usesDefaultAvatar?: boolean;
+    activeAvatarImage?: ActiveAvatarImage | null;
   }
   
   /** 날짜별 Actions (예시) */
@@ -75,7 +105,7 @@ export interface ApiResponse<T> {
   /** API 훅 설정 */
   export interface ApiHookConfig<T> {
     url: string;
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+    method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
     condition: boolean;
     payload?: T;
   }

@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  Image,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -27,6 +26,7 @@ import Constants from 'expo-constants';
 import { ChildActionList } from '@/components/ChildActionList';
 import { AdultActionList } from '@/components/AdultActionList';
 import SpeechBubble from '@/components/SpeechBubble';
+import AvatarArtwork from '@/components/AvatarArtwork';
 
 import {
   ApiResponse,
@@ -91,7 +91,7 @@ export default function HomeScreen() {
   }
   const [selectedDate, setSelectedDate] = useState<string>(formatDate(new Date()));
 
-  const {isLoggedIn} = useAuth();
+  const {isLoggedIn, user} = useAuth();
 
   // 예: GET /action?date=xxxx
   const { data: dateData, execute: dateExecute } = useApiGeneric<null, ApiResponse<ActionResponse[]>>({
@@ -298,8 +298,8 @@ export default function HomeScreen() {
                 />
               </View>
               <View style={styles.avatarContainer}>
-                <Image
-                  source={require('@/assets/images/avatar-girl-transparent.png')}
+                <AvatarArtwork
+                  imageUrl={user?.activeAvatarImage?.imageUrl}
                   style={styles.avatarImage}
                 />
               </View>

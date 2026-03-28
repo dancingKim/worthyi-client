@@ -1,5 +1,5 @@
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import {Image, StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Linking, Alert} from "react-native";
+import {StyleSheet, Text, View, SafeAreaView, TouchableOpacity, Linking, Alert} from "react-native";
 import {ThemedView} from "@/components/ThemedView";
 import LogOutButton from "@/components/buttons/LogOutButton";
 import {useAuth} from "@/context/AuthContext";
@@ -9,11 +9,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useApiGeneric } from "@/hooks/api/useApiGeneric";
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
+import AvatarArtwork from "@/components/AvatarArtwork";
 const BASE_URL = Constants.expoConfig?.extra?.BASE_URL ?? '';
 
 
 const ProfileScreen = () => {
-    const {user, logout} = useAuth();
+    const {user, logout, isLoggedIn} = useAuth();
+    const router = useRouter();
     const {data, isLoading, error, response, execute} = useApiGeneric({
         method: 'POST',
         url: `${BASE_URL}/auth/logout`,
@@ -26,15 +28,12 @@ const ProfileScreen = () => {
         } catch (error) {
             console.error('Logout execution failed:', error);
         } finally {
-            logout();
+            await logout();
         }
     };
 
     // 로그인 상태에 따라 버튼 렌더링
 const renderAuthButton = () => {
-    const { isLoggedIn } = useAuth();
-    const router = useRouter();
-  
     if (isLoggedIn) {
       return  (
         <View>
@@ -112,7 +111,7 @@ const renderAuthButton = () => {
                     onPress: async () => {
                         try {
                             await deleteAccountApi.execute();
-                            logout();
+                            await logout();
                         } catch (error) {
                             Alert.alert("오류", "계정 삭제 중 문제가 발생했습니다.");
                         }
@@ -128,8 +127,8 @@ const renderAuthButton = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.profileImageContainer}>
-                    <Image
-                        source={require('@/assets/images/avatar-girl-transparent.png')}
+                    <AvatarArtwork
+                        imageUrl={user?.activeAvatarImage?.imageUrl}
                         style={styles.profileImage}
                     />
                 </View>

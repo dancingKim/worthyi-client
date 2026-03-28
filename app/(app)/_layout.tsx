@@ -12,10 +12,10 @@ export default function AppLayout() {
         return <Loading/>;
     }
 
-    // if (!isLoggedIn) {
-    //     console.log('Not logged in, redirecting to login');
-    //     return <Redirect href="/login" />;
-    // }
+    if (!isLoggedIn) {
+        console.log('Not logged in, redirecting to login');
+        return <Redirect href="/login" />;
+    }
 
     console.log('AppLayout: about to render Stack');
     return (

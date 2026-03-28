@@ -16,7 +16,7 @@ const LoginScreen: React.FC = () => {
         try {
             setIsLoading(true);
             await handleSocialLogin(provider, login);
-            router.push('/');
+            router.replace('/(app)/(tabs)');
         } catch (error) {
             console.error('Login failed:', error);
         } finally {

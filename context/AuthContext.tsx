@@ -1,14 +1,8 @@
 // src/context/AuthContext.tsx
 import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react';
 import { User, AuthContextType } from '@/types/types';
-import { removeToken, saveToken, getToken, saveTokenByType } from '@/utils/authStorage';
+import { removeToken, saveToken, getToken, saveTokenByType, removeTokenByType } from '@/utils/authStorage';
 import { useUserMe } from '@/hooks/api/useUserMe';
-
-interface UserMeResponse {
-  id: number;
-  email: string;
-  name: string;
-}
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -24,22 +18,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // user/me 훅
   const { execute: fetchUserMe } = useUserMe();
 
+  const clearAuthState = async () => {
+    await removeToken();
+    await removeTokenByType("refresh_token");
+    setIsLoggedIn(false);
+    setUser(null);
+  };
+
+  const refreshUser = async (): Promise<User | null> => {
+    const res = await fetchUserMe();
+    if (res?.data) {
+      setUser(res.data);
+      setIsLoggedIn(true);
+      return res.data;
+    }
+
+    await clearAuthState();
+    return null;
+  };
+
   // 앱 시작 시 토큰과 사용자 정보를 복원
   useEffect(() => {
     const initAuth = async () => {
       try {
         const token = await getToken();
         if (token) {
-          setIsLoggedIn(true);
-          // /user/me 호출
-          const res = await fetchUserMe();
-          // res => ApiResponse<UserMeResponse> | null
-          if (res?.data) {
-            setUser(res.data); // 전역 user정보 세팅
-          }
+          await refreshUser();
         }
       } catch (err) {
         console.error('Failed to restore user info:', err);
+        await clearAuthState();
       } finally {
         setIsLoading(false);
       }
@@ -51,23 +59,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (accessToken: string, refreshToken: string) => {
     await saveToken(accessToken);
     await saveTokenByType("refresh_token", refreshToken);
-    setIsLoggedIn(true);
-    // 로그인 후 user/me 호출
     try {
-      const res = await fetchUserMe();
-      if (res?.data) {
-        setUser(res.data);
+      const nextUser = await refreshUser();
+      if (!nextUser) {
+        throw new Error('Unable to load user profile after login');
       }
     } catch (err) {
       console.error('Error fetching user after login:', err);
+      await clearAuthState();
+      throw err;
     }
   };
 
   // 로그아웃
   const logout = async () => {
-    await removeToken();
-    setIsLoggedIn(false);
-    setUser(null);
+    await clearAuthState();
   };
 
   const value: AuthContextType = {
@@ -75,6 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     login,
     logout,
+    refreshUser,
     isLoading,
   };
 
