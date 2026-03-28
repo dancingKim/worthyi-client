@@ -32,11 +32,11 @@ const AvatarScreen = () => {
   const { user, refreshUser } = useAuth();
   const {
     fetchAvatarImages,
-    generateAvatarImage,
+    createAvatarImage,
     setActiveAvatarImage,
     deleteAvatarImage,
     listState,
-    generateState,
+    createState,
     setActiveState,
     deleteState,
   } = useAvatarImageApi();
@@ -46,7 +46,7 @@ const AvatarScreen = () => {
   const [selectedReferenceAvatarId, setSelectedReferenceAvatarId] = useState<number | null>(null);
   const [selectedModelPreset, setSelectedModelPreset] = useState<ModelPreset>('BEST');
 
-  const isBusy = listState.isLoading || generateState.isLoading || setActiveState.isLoading || deleteState.isLoading;
+  const isBusy = listState.isLoading || createState.isLoading || setActiveState.isLoading || deleteState.isLoading;
 
   const avatarImages = avatarCollection?.avatarImages ?? [];
 
@@ -87,7 +87,7 @@ const AvatarScreen = () => {
     }
 
     try {
-      const response = await generateAvatarImage({
+      const response = await createAvatarImage({
         prompt: prompt.trim(),
         referenceAvatarImageId: selectedReferenceAvatarId,
         modelPreset: selectedModelPreset,
@@ -121,7 +121,7 @@ const AvatarScreen = () => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await deleteAvatarImage(null, `${BASE_URL}/avatar-images/${avatarImageId}`);
+              const response = await deleteAvatarImage(null, `${BASE_URL}/user/me/avatar-images/${avatarImageId}`);
               if (selectedReferenceAvatarId === avatarImageId) {
                 setSelectedReferenceAvatarId(null);
               }
@@ -271,7 +271,7 @@ const AvatarScreen = () => {
           />
 
           <TouchableOpacity style={styles.generateButton} onPress={handleGenerate} disabled={isBusy}>
-            {generateState.isLoading ? (
+            {createState.isLoading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
               <Text style={styles.generateButtonText}>새 캐릭터 만들기</Text>
