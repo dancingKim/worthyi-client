@@ -1,10 +1,10 @@
 // src/hooks/useApiGeneric.ts
 
 import { useState, useCallback } from 'react';
-import { getToken, getTokenByType, saveToken } from '@/utils/authStorage';
+import Constants from 'expo-constants';
+import { getToken, getTokenByType, saveToken, saveTokenByType } from '@/utils/authStorage';
 import { ApiHookConfig, ApiHookResult, ApiResponse } from '@/types/types';
 import { router } from 'expo-router';
-import { Alert } from 'react-native';
 
 /**
  * 공용 API 요청 훅
@@ -15,6 +15,7 @@ import { Alert } from 'react-native';
 export function useApiGeneric<T = any, U = any>(
   config: ApiHookConfig<T>
 ): ApiHookResult<U> {
+  const BASE_URL = Constants.expoConfig?.extra?.BASE_URL ?? '';
   const [response, setResponse] = useState<Response | null>(null);
   const [data, setData] = useState<U | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -34,12 +35,12 @@ export function useApiGeneric<T = any, U = any>(
       return null;
     }
 
-      const response = await fetch('https://api-dev.worthyilife.com/auth/token/refresh', {
+      const response = await fetch(`${BASE_URL}/auth/token/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: storedRefreshToken }),
       });
-      const responseData: ApiResponse<{ accessToken: string }> = await response.json();
+      const responseData: ApiResponse<{ accessToken: string; refreshToken?: string }> = await response.json();
 
       console.log("response:", response);
       console.log("responseData:", responseData);
@@ -49,6 +50,9 @@ export function useApiGeneric<T = any, U = any>(
         const newAccessToken = responseData.data.accessToken;
         // SecureStore 에 저장
         await saveToken(newAccessToken);
+        if (responseData.data.refreshToken) {
+          await saveTokenByType("refresh_token", responseData.data.refreshToken);
+        }
         // 전역 AuthContext를 갱신하지 않음(→ circular dependency 피함)
         return newAccessToken;
       }
@@ -160,7 +164,7 @@ export function useApiGeneric<T = any, U = any>(
         setIsLoading(false);
       }
     },
-    [config]
+    [config, BASE_URL]
   );
 
   return { data, isLoading, error, execute, response };

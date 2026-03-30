@@ -90,6 +90,7 @@ export default function RootLayout() {
             <Stack>
               <Stack.Screen name="(app)" options={{ headerShown: false }} />
               <Stack.Screen name="login" options={{ headerShown: false }} />
+              <Stack.Screen name="sociallogin" options={{ headerShown: false }} />
             </Stack>
           </ThemeProvider>
         </AuthProvider>
