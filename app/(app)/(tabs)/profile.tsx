@@ -64,10 +64,6 @@ const renderAuthButton = () => {
     }
   };
 
-    const handleNotionPress = () => {
-        Linking.openURL('https://worthyilife.notion.site/Worthy-I-128f8a2dfd758048b6b3f4707d1565bf?pvs=4');
-    };
-
     const handleEmailPress = async () => {
         try {
             const canOpen = await Linking.canOpenURL('mailto:worthyilife@gmail.com');
@@ -137,10 +133,6 @@ const renderAuthButton = () => {
             </View>
 
             <View style={styles.menuContainer}>
-                <TouchableOpacity style={styles.menuItem} onPress={handleNotionPress}>
-                    <Ionicons name="document-text-outline" size={24} color="#FF69B4" />
-                    <Text style={styles.menuText}>감사일기 노션 템플릿 이용하기</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={handleEmailPress}>
                     <Ionicons name="mail-outline" size={24} color="#FF69B4" />
                     <Text style={styles.menuText}>의견 보내기</Text>
